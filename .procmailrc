@@ -1,0 +1,9 @@
+MAILDIR=$HOME/.mail      # You'd better make sure it exists
+DEFAULT=$MAILDIR/mbox
+LOGFILE=$MAILDIR/from
+
+:0:
+* ^From.*neri@hpe.com
+# \/ defines what will be matched in $MATCH
+* ^Subject: *CREATE \/.+
+| $HOME/procmail-action.sh $MATCH
