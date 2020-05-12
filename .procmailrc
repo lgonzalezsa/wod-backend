@@ -2,8 +2,8 @@ MAILDIR=$HOME/.mail      # You'd better make sure it exists
 DEFAULT=$MAILDIR/mbox
 LOGFILE=$MAILDIR/from
 
-:0:
-* ^From.*neri@hpe.com
+:0b
+#* ^From.*jupyter@notebooks.hpedev.io.*
 # \/ defines what will be matched in $MATCH
-* ^Subject: *CREATE \/.+
+* ^Subject: *CREATE \/[1-9]+.*
 | $HOME/procmail-action.sh $MATCH
