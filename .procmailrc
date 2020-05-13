@@ -6,4 +6,10 @@ LOGFILE=$MAILDIR/from
 #* ^From.*jupyter@notebooks.hpedev.io.*
 # \/ defines what will be matched in $MATCH
 * ^Subject: *CREATE \/[1-9]+.*
-| $HOME/procmail-action.sh $MATCH
+| $HOME/procmail-action.sh CREATE $MATCH
+
+:0b
+#* ^From.*jupyter@notebooks.hpedev.io.*
+# \/ defines what will be matched in $MATCH
+* ^Subject: *CLEANUP \/[1-9]+.*
+| $HOME/procmail-action.sh CLEANUP $MATCH
