@@ -11,7 +11,7 @@ set -e
 set -x
 
 action=$1
-if [ _"$1" == _"" ]; then
+if [ _"$1" = _"" ]; then
 	echo "Syntax: procmail-action.sh <CREATE|CLEANUP> <student id> <user id>"
 	echo "ACTION is mandatory"
 	exit -1
@@ -19,14 +19,14 @@ fi
 shift
 
 # Check action
-if [ $action != "CREATE" && $action != "CLEANUP" ]; then
+if [ $action != "CREATE" ]  && [ $action != "CLEANUP" ]; then
 	echo "Syntax: procmail-action.sh <CREATE|CLEANUP> <student id> <user id>"
 	echo "A correct ACTION is mandatory"
 	exit -1
 fi
 
 stdid=$1
-if [ _"$1" == _"" ]; then
+if [ _"$1" = _"" ]; then
 	echo "Syntax: procmail-action.sh <CREATE|CLEANUP> <student id> <user id>"
 	echo "Student id is mandatory"
 	exit -1
@@ -34,7 +34,7 @@ fi
 shift
 
 userid=$1
-if [ _"$1" == _"" ]; then
+if [ _"$1" = _"" ]; then
 	echo "Syntax: procmail-action.sh <CREATE|CLEANUP> <student id> <user id>"
 	echo "User is mandatory"
 	exit -1
@@ -58,13 +58,13 @@ cd $std0
 if [ -d "$stddir" ]; then
 	echo "Erasing target student dir $stddir content"
 	sudo rm -rf $stddir/*
-	if [ "$action" == "CREATE" ]; then
+	if [ "$action" = "CREATE" ]; then
 		while read w; 
 		do
 			if [ ! -n "$w" ]; then
 				continue
 			fi
-			if [ ! -d $std0/NBSONDEMAND/$w ]; then
+			if [ ! -d "$std0/NBSONDEMAND/$w" ]; then
 				echo "Skipping non-existant workshop $w"
 				continue
 			fi
@@ -84,13 +84,13 @@ curl --header "Content-Type: application/json" \
   --data '{"password":"'$randompw'"}' \
   "http://77.158.163.130:3002/api/student/edit/$stdid"
 
-if [ "$action" == "CREATE" ]; then
+if [ "$action" = "CREATE" ]; then
 	##Update customer status to active
 	curl --header "Content-Type: application/json" \
   --request PUT \
   --data '{"active": "true"}' \
   "http://77.158.163.130:3002/api/customer/edit/$userid"
-elif [ "$action" == "CLEANUP" ]; then
+elif [ "$action" = "CLEANUP" ]; then
 	##Update customer status to inactive
 	curl --header "Content-Type: application/json" \
   --request PUT \
