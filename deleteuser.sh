@@ -15,8 +15,8 @@ while [ "$typename" = "" ]
 echo type is  $typename
 
 #ASK FOR RANGE: Starting number and ending number separated by a space
-startramge=""
-endrange=""
+startramge=0
+endrange=0
 while [[ $startrange -eq 0 || $endrange -eq 0 || $startrange -gt $endrange ]]
   do
 	echo "Please provide range for user: starting and ending separated by a space:"
