@@ -3,13 +3,20 @@ DEFAULT=$MAILDIR/mbox
 LOGFILE=$MAILDIR/from
 
 :0b
-#* ^From.*bounces+6329306-736e-jupyter=notebooks.hpedev.io@sendgrid.net.*
+#* ^From.*hpedev.hackshack@hpe.com.*
 # \/ defines what will be matched in $MATCH
 * ^Subject: *CREATE \/[1-9]+.*
 | $HOME/procmail-action.sh CREATE $MATCH
 
 :0b
-#* ^From.*bounces+6329306-736e-jupyter=notebooks.hpedev.io@sendgrid.net.*
+#* ^From.*hpedev.hackshack@hpe.com.*
 # \/ defines what will be matched in $MATCH
 * ^Subject: *CLEANUP \/[1-9]+.*
 | $HOME/procmail-action.sh CLEANUP $MATCH
+
+:0b
+#* ^From.*hpedev.hackshack@hpe.com.*
+* ^Subject: *RESET *$
+| $HOME/procmail-action.sh RESET
+
+
