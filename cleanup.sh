@@ -20,14 +20,14 @@ endrange=0
 # while [[ $endrange -eq 0 ]]
 while [[ $startrange -eq 0 || $endrange -eq 0 || $startrange -gt $endrange ]]
 do
-	echo "Please provide range for user: starting and ggding separated by a space:"
+	echo "Please provide range for user: starting and ending separated by a space:"
 	read startrange endrange
   done
 echo range from $startrange to  $endrange
 
-echo this script will create usernames from $typename$startrange to $typename$endrange
+echo this script will empty home folders of  usernames from $typename$startrange to $typename$endrange
 
-for i in $(seq $startrange $endrange); do username="$typename$i"; rm -rf /home/$username/*; done
+for i in $(seq $startrange $endrange); do username="$typename$i"; sudo rm -rf /home/$username/*; done
 
 #for i in $(cat devtalkuser.txt); do adduser $i --gecos "First Last,RoomNumber,WorkPhone,HomePhone" --disabled-password -ingroup jupyter; echo $i:dev2020 | chpasswd ; done
 

@@ -2,7 +2,7 @@
 # ggggggggggg
 clear
 #ASK FOR USER TYPE TESTER CHALLENGER OR STUDENT
-typename=""
+typename="student"
 while [ "$typename" = "" ]
   do 
 	echo "Choose between student, challenger, or tester please"
@@ -34,6 +34,6 @@ do
 
 echo "this script will change username password from $typename$startrange to $typename$endrange" 
 
-for i in $(seq $startrange $endrange); do username="$typename$i"; echo $username:$password | chpasswd ; done
+for i in $(seq $startrange $endrange); do username="$typename$i"; echo $username:$password | sudo chpasswd ; done
 
 
