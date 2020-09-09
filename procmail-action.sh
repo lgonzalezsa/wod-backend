@@ -64,8 +64,9 @@ fi
 
 # Main of script
 action=$1
+echo "we are working on "$action
 if [ _"$1" = _"" ]; then
-	echo "Syntax: procmail-action.sh <CREATE|CLEANUP|RESET> <student id> <user id>"
+	echo "Syntax: procmail-action.sh <CREATE||RESET> <student id> <user id>"
 	echo "ACTION is mandatory"
 	exit -1
 fi
@@ -73,31 +74,31 @@ shift
 
 # Check action
 if [ $action != "CREATE" ]  && [ $action != "CLEANUP" ]  && [ $action != "RESET" ]; then
-	echo "Syntax: procmail-action.sh <CREATE|CLEANUP|RESET> <student id> <user id>"
+	echo "Syntax: procmail-action.sh <CREATE|CLEANUP|RESET> <student id> [<user id>]"
 	echo "A correct ACTION is mandatory"
 	exit -1
 fi
 
+stdid=$1
+if [ _"$1" = _"" ]; then
+	echo "Syntax: procmail-action.sh <CREATE|CLEANUP|RESET> <student id> [<user id>]"
+	echo "Student Username id is mandatory"
+	exit -1
+fi
+shift
+
 # Handle CREATE and CLEANUP first
 if [ $action != "RESET" ]; then
-	stdid=$1
-	if [ _"$1" = _"" ]; then
-		echo "Syntax: procmail-action.sh <CREATE|CLEANUP> <student id> <user id>"
-		echo "Student id is mandatory"
-		exit -1
-	fi
-	shift
-
 	userid=$1
 	if [ _"$1" = _"" ]; then
 		echo "Syntax: procmail-action.sh <CREATE|CLEANUP> <student id> <user id>"
-		echo "User id is mandatory"
+		echo "Customer id is mandatory"
 		exit -1
 	fi
 
 	# We need to ensure that we've got a correct id as parameter if needed
-	MIN=$((1+$BASESTDID))
-	MAX=$((900+$BASESTDID))
+	MIN=1
+	MAX=800
 
 	if [ $stdid -le $MIN ] ||  [ $stdid -ge $MAX ]; then
 		echo "Student id ($stdid) should be between $MIN and $MAX"
@@ -134,14 +135,15 @@ if [ $action != "RESET" ]; then
 		echo "student$stdid:$randompw" | sudo chpasswd
 
 		# Increment the student ID by Number of jupyter students in students table
-		stdid=$((stdid+$BASESTDID))
+    		# Only for API Calls 
+		dbstdid=$((stdid+$BASESTDID))
 
 		# Instead do 2 API calls here, one for passwd change, one for status change
 		##Update Password
 		curl --header "Content-Type: application/json" \
   			--request PUT \
   			--data '{"password":"'$randompw'"}' \
-  			"$APIENDPOINT/student/$stdid"
+  			"$APIENDPOINT/student/$dbstdid"
 
 		if [ "$action" = "CREATE" ]; then
 			##Update customer status to active
@@ -157,12 +159,12 @@ if [ $action != "RESET" ]; then
 				curl --header "Content-Type: application/json" \
   					--request PUT \
   					--data '{"assigned":"false"}' \
-  					"$APIENDPOINT/student/$stdid"
+  					"$APIENDPOINT/student/$dbstdid"
 			else
 				curl --header "Content-Type: application/json" \
   					--request PUT \
   					--data '{"assigned":"true"}' \
-  					"$APIENDPOINT/student/$stdid"
+  					"$APIENDPOINT/student/$dbstdid"
 	 			# set customer  to inactive by default for all workshops
         			curl --header "Content-Type: application/json" \
   					--request PUT \
@@ -187,19 +189,23 @@ elif [ "$action" = "RESET" ]; then
         		echo "Reseting workshop $w Backend"
 			$HOME/reset-$w
 		fi
+
 		# API call TBD (active or assigned ?)
-		min=`echo $tdid | cut -d, -f1`
-		max=`echo $tdid | cut -d, -f2`
+		min=`echo $stdid | cut -d, -f1`
+		max=`echo $stdid | cut -d, -f2`
+		min=$((min+$BASESTDID))
+		max=$((max+$BASESTDID))
 		i=$max
-		cap=$((max-min))
-		while [ $i >= $min ]; do
+		cap=$((max-min+1))
+
+		while [ $i -ge $min ]; do
 			# API call
 			##Update customer status to inactive
 			curl --header "Content-Type: application/json" \
   				--request PUT \
   				--data '{"assigned":"false"}' \
   				"$APIENDPOINT/student/$i"
-			((i= i-1))
+			((i=i-1))
 		done
 
 		# API call to Now reset capacity to original value

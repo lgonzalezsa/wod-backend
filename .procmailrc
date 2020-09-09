@@ -16,7 +16,8 @@ LOGFILE=$MAILDIR/from
 
 :0b
 #* ^From.*hpedev.hackshack@hpe.com.*
-* ^Subject: *RESET *$
-| $HOME/procmail-action.sh RESET
+# \/ defines what will be matched in $MATCH
+* ^Subject: *RESET \/[1-9]+.*
+| $HOME/procmail-action.sh RESET $MATCH
 
 
