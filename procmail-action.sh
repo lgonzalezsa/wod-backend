@@ -183,7 +183,20 @@ if [ $action != "RESET" ]; then
   				--request PUT \
   				--data '{"active": "true"}' \
   				"$APIENDPOINT/customer/$userid"
+			##Start Student jupyterhub dedicated server
+			#curl --header "Content-Type: application/json" \
+			#	--header "Authorization: token $JUPYTERHUBTOKEN" \
+                        #        --location \
+                        #        --request POST \
+			#	--data-raw '{}' \
+                        #        "$JUPYTERHUBAPI/hub/api/users/student$stdid/server"
+
 		elif [ "$action" = "CLEANUP" ]; then
+			#Delete Student jupyterhub dedicated server
+			curl --header "Authorization: token $JUPYTERHUBTOKEN" \
+                                --location \
+				--request DELETE \
+                                "$JUPYTERHUBAPI/hub/api/users/student$stdid/server" 
 			#Get Worshop reset status to determine if users should be updated to inactive or not
 			if [ _"`get_reset_status $id`" = _"false" ]; then
 				# Possible to clean dirs because no RESET so no file needed in that dir
