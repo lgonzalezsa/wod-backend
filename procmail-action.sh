@@ -65,6 +65,9 @@ get_workshop_name() {
 	if [ ! -n "$w" ]; then
 		echo "Missing workshop name in the e-mail body"
 		exit -1
+	if [ ! -d "$std0/$w" ]; then
+		echo "Non-existant workshop $w"
+		exit -1
 	fi
 	echo "$w"
 }
@@ -78,11 +81,19 @@ get_workshop_name() {
 # endpoint variable - Has to be global
 APIENDPOINT="https://hackshackondemand.hpedev.io/api"
 
-# Base for student IDs is 800 for Grenoble, 0 for Mougins
+#Jupyterhub API variable depending on site
 if [ _"`hostname -s`" = _"jupyterhub2" ]; then
+        JUPYTERHUBAPI="http://jupyterhub2.hp.local:8000"
+	JUPYTERHUBTOKEN="542213857571415da66bbd716485f2c8"
+	# Base for student IDs is 800 for Grenoble, 0 for Mougins
 	BASESTDID=800
+	LDAPSRV=ldapsrv02.hp.local
 else
+        JUPYTERHUBAPI="http://jupyter.etc.fr.comm.hpecorp.net:8000"
+	JUPYTERHUBTOKEN="156a45e5cd27476bbf0db09a408ae4bb"
+	# Base for student IDs is 800 for Grenoble, 0 for Mougins
 	BASESTDID=0
+	LDAPSRV=ldapsrv02.hpedevlab.net
 fi
 
 # Main of script
@@ -110,6 +121,20 @@ if [ _"$1" = _"" ]; then
 fi
 shift
 
+# We need to ensure that we've got a correct id as parameter if needed
+MIN=1
+MAX=800
+
+if [ $stdid -le $MIN ] ||  [ $stdid -ge $MAX ]; then
+	echo "Student id ($stdid) should be between $MIN and $MAX"
+	exit -1
+fi
+
+stddir="/home/student$stdid"
+std0="/home/student0"
+w=`get_workshop_name`
+id=`get_workshop_id $w`
+
 # Handle CREATE and CLEANUP first
 if [ $action != "RESET" ]; then
 	userid=$1
@@ -119,17 +144,6 @@ if [ $action != "RESET" ]; then
 		exit -1
 	fi
 
-	# We need to ensure that we've got a correct id as parameter if needed
-	MIN=1
-	MAX=800
-
-	if [ $stdid -le $MIN ] ||  [ $stdid -ge $MAX ]; then
-		echo "Student id ($stdid) should be between $MIN and $MAX"
-		exit -1
-	fi
-
-	stddir="/home/student$stdid"
-	std0="/home/student0"
 	cd $std0
 
 	# Read workshop list on stdin
@@ -180,7 +194,6 @@ if [ $action != "RESET" ]; then
   				"$APIENDPOINT/customer/$userid"
 		elif [ "$action" = "CLEANUP" ]; then
 			#Get Worshop reset status to determine if users should be updated to inactive or not
-			id=`get_workshop_id $w`
 			if [ _"`get_reset_status $id`" = _"false" ]; then
 				##Update customer status to inactive
 				curl --header "Content-Type: application/json" \
@@ -204,8 +217,6 @@ if [ $action != "RESET" ]; then
 	fi
 
 elif [ "$action" = "RESET" ]; then
-	w=`get_workshop_name`
-	id=`get_workshop_id $w`
 	if [ _"`get_reset_status $id`" = _"true" ]; then
 		# Then call the reset script
 		# Get Workshop backend reset status
