@@ -1,4 +1,5 @@
 #!/bin/bash
+#
 clear
 #ASK FOR USER TYPE TESTER CHALLENGER OR STUDENT
 typename=""
@@ -7,7 +8,6 @@ while [ "$typename" = "" ]
 	echo "Choose between student, challenger, or tester please"
 	read typename
 	if  [ "$typename" != "student" ] && [ "$typename" != "challenger" ] && [ "$typename" != "tester" ]; then
-		echo "invalid entry $typename"
 		typename=""
 	fi	
   done
@@ -27,5 +27,4 @@ echo range from $startrange to  $endrange
 echo this script will delete usernames from $typename$startrange to $typename$endrange
 
 for i in $(seq $startrange $endrange); do username="$typename$i"; userdel -r  $username ; done
-
 
