@@ -263,9 +263,10 @@ elif [ "$action" = "RESET" ]; then
 	        curl --header "Content-Type: application/json" \
   			--request PUT \
   			--data '{"capacity":"'$cap'"}' \
-  			"$APIENDPOINT/workshops/$id"
+  			"$APIENDPOINT/workshop/$id"
 	fi
 
 else
 	echo "Unknown action $action"
 fi
+
