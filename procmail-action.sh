@@ -148,24 +148,6 @@ if [ $action != "RESET" ]; then
 
 	# Read workshop list on stdin
 	if [ -d "$stddir" ]; then
-		echo "Erasing target student dir $stddir content"
-		sudo rm -rf $stddir/*
-		if [ "$action" = "CREATE" ]; then
-			while read w; 
-			do
-				if [ ! -n "$w" ]; then
-					continue
-				fi
-				if [ ! -d "$std0/$w" ]; then
-					echo "Skipping non-existant workshop $w"
-					continue
-				fi
-				echo "Copying workshop $w content into target student dir $stddir"
-				sudo ansible-playbook ansible_copy_folder.yml -i inventory -e "dir=  workshop=$w myrange=$stdid"
-			done
-		else
-			w=`get_workshop_name`
-		fi
 		# Now change passwd
 		randompw=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
 		echo "student$stdid:$randompw" | sudo chpasswd
@@ -173,6 +155,15 @@ if [ $action != "RESET" ]; then
 		# Some Notebooks need an LDAP passwd update as well
 		if [ _"`get_ldap_status $id`" != _"false" ]; then
 			`update_ldap_passwd`
+		fi
+
+		if [ "$action" = "CREATE" ]; then
+			if [ _"$stddir" != _"" ]; then
+				echo "Erasing target student dir $stddir content"
+				sudo rm -rf $stddir/*
+			fi
+			echo "Copying workshop $w content into target student dir $stddir"
+			sudo ansible-playbook ansible_copy_folder.yml -i inventory -e "dir=  workshop=$w myrange=$stdid passwd=$randompw"
 		fi
 
 		# Increment the student ID by Number of jupyter students in students table
@@ -195,6 +186,11 @@ if [ $action != "RESET" ]; then
 		elif [ "$action" = "CLEANUP" ]; then
 			#Get Worshop reset status to determine if users should be updated to inactive or not
 			if [ _"`get_reset_status $id`" = _"false" ]; then
+				# Possible to clean dirs because no RESET so no file needed in that dir
+				if [ _"$stddir" != _"" ]; then
+					echo "Erasing target student dir $stddir content"
+					sudo rm -rf $stddir/*
+				fi
 				##Update customer status to inactive
 				curl --header "Content-Type: application/json" \
   					--request PUT \
@@ -226,6 +222,10 @@ elif [ "$action" = "RESET" ]; then
 		else
         		echo "Reseting workshop $w Backend"
 			$HOME/reset-$w
+		fi
+		if [ _"$stddir" != _"" ]; then
+			echo "Erasing target student dir $stddir content"
+			sudo rm -rf $stddir/*
 		fi
 
 		# API call TBD (active or assigned ?)
