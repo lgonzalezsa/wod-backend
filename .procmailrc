@@ -20,4 +20,3 @@ LOGFILE=$MAILDIR/from
 * ^Subject: *RESET \/[1-9]+.*
 | $HOME/procmail-action.sh RESET $MATCH
 
-

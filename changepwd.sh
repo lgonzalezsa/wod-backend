@@ -1,16 +1,16 @@
 #!/bin/bash
-# ggggggggggg
+#
 clear
 #ASK FOR USER TYPE TESTER CHALLENGER OR STUDENT
-typename="student"
+typename=""
 while [ "$typename" = "" ]
-  do 
+do 
 	echo "Choose between student, challenger, or tester please"
 	read typename
 	if  [ "$typename" != "student" ] && [ "$typename" != "challenger" ] && [ "$typename" != "tester" ]; then
 		typename=""
 	fi	
-  done
+done
 
 echo type is  $typename
 
@@ -22,7 +22,7 @@ while [[ $startrange -eq 0 || $endrange -eq 0 || $startrange -gt $endrange ]]
 do
 	echo "Please provide range for user: starting and ggding separated by a space:"
 	read startrange endrange
-  done
+done
 #ASK FOR PASSWORD: 
 password=""
 
@@ -34,6 +34,7 @@ do
 
 echo "this script will change username password from $typename$startrange to $typename$endrange" 
 
-for i in $(seq $startrange $endrange); do username="$typename$i"; echo $username:$password | sudo chpasswd ; done
-
-
+for i in $(seq $startrange $endrange); do 
+	username="$typename$i"
+	echo "$username:$password" | sudo chpasswd 
+done
