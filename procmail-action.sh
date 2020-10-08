@@ -36,8 +36,31 @@ get_reset_status() {
 	echo "$ret"
 }
 
+# This function returns the status of the need of LDAP setup for the workshop id given as parameter
+get_ldap_status() {
+
+	ret=`curl -s --header "Content-Type: application/json" "$APIENDPOINT/workshops/$1" | jq -r '.ldap'`
+	echo "$ret"
+}
+
+# This function updates the LDAP passwd with $randompw for the student under management (using $stdid)
+update_ldap_passwd() {
+
+	rm -f /tmp/ldif.$$
+	cat > /tmp/ldif.$$ << EOF
+#modify user password
+dn: uid=student$stdid,ou=People,dc=hpedevlab,dc=net
+changetype: modify
+replace: userPassword
+userPassword: $randompw
+EOF
+	ldapmodify -D "cn=Directory Manager" -w CloudSystem$ -p 389 -h $LDAPSRV -x -f /tmp/ldif.$$
+	rm -f /tmp/ldif.$$
+}
+
 # This function retuns the workshop name from the mail body
 get_workshop_name() {
+
 	read w
 	if [ ! -n "$w" ]; then
 		echo "Missing workshop name in the e-mail body"
@@ -131,8 +154,12 @@ if [ $action != "RESET" ]; then
 		fi
 		# Now change passwd
 		randompw=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
-
 		echo "student$stdid:$randompw" | sudo chpasswd
+
+		# Some Notebooks need an LDAP passwd update as well
+		if [ _"`get_ldap_status $id`" != _"false" ]; then
+			`update_ldap_passwd`
+		fi
 
 		# Increment the student ID by Number of jupyter students in students table
     		# Only for API Calls 
