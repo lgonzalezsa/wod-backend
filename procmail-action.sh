@@ -65,6 +65,7 @@ get_workshop_name() {
 	if [ ! -n "$w" ]; then
 		echo "Missing workshop name in the e-mail body"
 		exit -1
+	fi
 	if [ ! -d "$std0/$w" ]; then
 		echo "Non-existant workshop $w"
 		exit -1
