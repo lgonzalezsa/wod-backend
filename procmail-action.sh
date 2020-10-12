@@ -89,12 +89,21 @@ if [ _"`hostname -s`" = _"jupyterhub2" ]; then
 	# Base for student IDs is 800 for Grenoble, 0 for Mougins
 	BASESTDID=800
 	LDAPSRV=ldapsrv02.hp.local
-else
-        JUPYTERHUBAPI="http://jupyter.etc.fr.comm.hpecorp.net:8000"
-	JUPYTERHUBTOKEN="156a45e5cd27476bbf0db09a408ae4bb"
+elif [ _"`hostname -s`" = _"jupyterhub" ]; then
+        JUPYTERHUBAPI="http://jupyterhub.etc.fr.comm.hpecorp.net:8000"
+	JUPYTERHUBTOKEN="f75c13f965704630bdb0af023c5da72b"
 	# Base for student IDs is 800 for Grenoble, 0 for Mougins
 	BASESTDID=0
 	LDAPSRV=ldapsrv02.hpedevlab.net
+elif [ _"`hostname -s`" = _"jupyterhub3" ]; then
+        JUPYTERHUBAPI="http://jupyterhub3.etc.fr.comm.hpecorp.net:8000"
+	JUPYTERHUBTOKEN="70fe9e91e8004cc4b9df2ee0ff7a1c14"
+	# Base for student IDs is 800 for Grenoble, 0 for Mougins
+	BASESTDID=0
+	LDAPSRV=ldapsrv02.hpedevlab.net
+else
+	echo "This machine is not a jupyterhub machine"
+	exit -1
 fi
 
 # Main of script
