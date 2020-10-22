@@ -1,0 +1,97 @@
+# Playbook expects to have a Student0 folder in the directory where the playbook is run
+- hosts: jupyterhub
+  gather_facts: false
+  #connection:
+  vars:
+       usermin: 1
+       usermax: 10 
+       gidbase: 2000
+       uidbase: 2000
+  tasks: 
+    - name: check that directory /student exists
+      become: yes
+      become_user: root
+      file: 
+        path: "/student"
+        state: directory
+        owner: jupyter
+        group: jupyter
+        mode: 0711
+
+    - name: check that directory /jupyter/student0 exists
+      file:
+        path: "/home/jupyter/student0"
+        state: directory
+        owner: jupyter
+        group: jupyter
+        mode: 0750
+
+    
+    - name: destroy existing student jupyter  users
+      command: "curl -X DELETE --silent -k -H 'Authorization: token {{ admintoken }}' {{ jupyterhubapi }}/hub/api/users/{{ 'student%s' | format(item) }}"
+      loop: "{{ range( usermin, usermax + 1)|list }}"
+
+    - name: Ansible delete linux user for studentx and its home directory
+      become: yes
+      become_user: root
+      user:
+        name: "{{ 'student%s' | format(item) }}"
+        state: absent
+        remove: yes  
+        force: yes
+      loop: "{{ range( usermin, usermax + 1)|list }}"
+
+    - name: Ensure dedicated group studentx exists
+      become: yes
+      become_user: root
+      group:
+        name: "{{ 'student%s' | format(item) }}"
+        state: present
+        gid: "{{ item + gidbase }}"
+      loop: "{{ range( usermin, usermax + 1)|list }}"
+
+
+    - name: create student linux user for studentx and its home directory
+      become: yes
+      become_user: root
+      user:
+        name: "{{ 'student%s' | format(item) }}"
+        state: present
+        create_home: true
+        home: "/student/{{ 'student%s' | format(item) }}"
+        comment: "{{ 'student%s' | format(item) }}"
+        shell: /bin/bash
+        uid: "{{ item + uidbase }}"
+        group: "{{ 'student%s' | format(item) }}"
+      loop: "{{ range( usermin, usermax + 1)|list }}"
+    
+    - name: check that student home directory /student/student%$' exists
+      become: yes
+      become_user: root
+      file:
+        path: "/student/{{ 'student%s' | format(item) }}"
+        state: directory
+        owner: "{{ 'student%s' | format(item) }}"
+        group: "{{ 'student%s' | format(item) }}"
+        mode: 0700
+      loop: "{{ range( usermin, usermax + 1)|list }}"
+    
+    - name: create  student jupyter  users
+      command: "curl -X POST --silent -k -H 'Authorization: token {{ admintoken }}' {{ jupyterhubapi }}/hub/api/users/{{ 'student%s' | format(item) }}"
+      loop: "{{ range( usermin, usermax + 1)|list }}"
+
+    - name: setup studentx acl for jupyter
+      become: yes
+      become_user: root
+      ansible.posix.acl:
+        path: "/student/{{ 'student%s' | format(item) }}"
+        recursive: yes
+        entity: jupyter
+        etype: user
+        permissions: rwx
+        #default: yes
+        state: present
+      loop: "{{ range( usermin, usermax + 1)|list }}"
+
+
+  

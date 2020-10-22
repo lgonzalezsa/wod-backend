@@ -54,8 +54,23 @@ changetype: modify
 replace: userPassword
 userPassword: $randompw
 EOF
-	ldapmodify -D "cn=Directory Manager" -w CloudSystem$ -p 389 -h $LDAPSRV -x -f /tmp/ldif.$$
+	ldapmodify -D "cn=Directory Manager" -w CloudSystem$ -p 389 -h $LDAPSRV -x -f /tmp/ldif.$$ 
 	rm -f /tmp/ldif.$$
+}
+
+# This function creates a variable file in which password is stored fro athe ansble playbook to handle and use to substitue $$PASSWD in notebook the LDAP passwd with $randompw
+create_var_passwd() {
+
+  cat > /tmp/variables_$$.yml << EOF
+---
+substitutions:
+  - varname: PASSWD
+    varsubst:
+      "$stdid": $randompw
+EOF
+  chmod 640 /tmp/variables_$$.yml
+  # TODO: Would be nice to setup a lock file
+  mv -f /tmp/variables_$$.yml $std0/variables_$w.yml
 }
 
 # This function retuns the workshop name from the mail body
@@ -123,7 +138,7 @@ if [ $action != "CREATE" ]  && [ $action != "CLEANUP" ]  && [ $action != "RESET"
 	exit -1
 fi
 
-stdid=$1
+export stdid=$1
 if [ _"$1" = _"" ]; then
 	echo "Syntax: procmail-action.sh <CREATE|CLEANUP|RESET> <student id> [<user id>]"
 	echo "Student Username id is mandatory"
@@ -133,7 +148,7 @@ shift
 
 # We need to ensure that we've got a correct id as parameter if needed
 MIN=1
-MAX=800
+MAX=1000
 
 if [ $stdid -le $MIN ] ||  [ $stdid -ge $MAX ]; then
 	echo "Student id ($stdid) should be between $MIN and $MAX"
@@ -142,7 +157,7 @@ fi
 
 stddir="/home/student$stdid"
 std0="/home/student0"
-w=`get_workshop_name`
+export w=`get_workshop_name`
 id=`get_workshop_id $w`
 
 # Handle CREATE and CLEANUP first
@@ -164,7 +179,8 @@ if [ $action != "RESET" ]; then
 
 		# Some Notebooks need an LDAP passwd update as well
 		if [ _"`get_ldap_status $id`" != _"false" ]; then
-			`update_ldap_passwd`
+			update_ldap_passwd
+			create_var_passwd
 		fi
 
 		if [ "$action" = "CREATE" ]; then
@@ -173,7 +189,7 @@ if [ $action != "RESET" ]; then
 				sudo rm -rf $stddir/*
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			sudo ansible-playbook ansible_copy_folder.yml -i inventory -e "dir=  workshop=$w myrange=$stdid passwd=$randompw"
+			sudo ansible-playbook ansible_copy_folder.yml -i inventory -e "dir=  workshop=$w myrange=$stdid"
 		fi
 
 		# Increment the student ID by Number of jupyter students in students table
@@ -279,4 +295,5 @@ elif [ "$action" = "RESET" ]; then
 else
 	echo "Unknown action $action"
 fi
+echo "end of procmail-action at `date` "
 
