@@ -6,16 +6,16 @@ LOGFILE=$MAILDIR/from
 #* ^From.*hpedev.hackshack@hpe.com.*
 # \/ defines what will be matched in $MATCH
 * ^Subject: *CREATE \/[1-9]+.*
-| $HOME/procmail-action.sh CREATE $MATCH
+| $HOME/scripts/procmail-action.sh CREATE $MATCH
 
 :0b
 #* ^From.*hpedev.hackshack@hpe.com.*
 # \/ defines what will be matched in $MATCH
 * ^Subject: *CLEANUP \/[1-9]+.*
-| $HOME/procmail-action.sh CLEANUP $MATCH
+| $HOME/scripts/procmail-action.sh CLEANUP $MATCH
 
 :0b
 #* ^From.*hpedev.hackshack@hpe.com.*
 # \/ defines what will be matched in $MATCH
 * ^Subject: *RESET \/[1-9]+.*
-| $HOME/procmail-action.sh RESET $MATCH
+| $HOME/scripts/procmail-action.sh RESET $MATCH

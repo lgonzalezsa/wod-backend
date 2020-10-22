@@ -155,8 +155,8 @@ if [ $stdid -le $MIN ] ||  [ $stdid -ge $MAX ]; then
 	exit -1
 fi
 
-stddir="/home/student$stdid"
-std0="/home/student0"
+stddir="/student/student$stdid"
+std0="$HOME/student0"
 export w=`get_workshop_name`
 id=`get_workshop_id $w`
 
@@ -186,10 +186,10 @@ if [ $action != "RESET" ]; then
 		if [ "$action" = "CREATE" ]; then
 			if [ _"$stddir" != _"" ]; then
 				echo "Erasing target student dir $stddir content"
-				sudo rm -rf $stddir/*
+				rm -rf $stddir/*
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			sudo ansible-playbook ansible_copy_folder.yml -i inventory -e "dir=  workshop=$w myrange=$stdid"
+			ansible-playbook $HOME/scripts/ansible_copy_folder.yml -i $HOME/scripts/inventory -e "dir=  workshop=$w myrange=$stdid"
 		fi
 
 		# Increment the student ID by Number of jupyter students in students table
@@ -228,7 +228,7 @@ if [ $action != "RESET" ]; then
 				# Possible to clean dirs because no RESET so no file needed in that dir
 				if [ _"$stddir" != _"" ]; then
 					echo "Erasing target student dir $stddir content"
-					sudo rm -rf $stddir/*
+					rm -rf $stddir/*
 				fi
 				##Update customer status to inactive
 				curl --header "Content-Type: application/json" \
@@ -255,16 +255,16 @@ elif [ "$action" = "RESET" ]; then
 	if [ _"`get_reset_status $id`" = _"true" ]; then
 		# Then call the reset script
 		# Get Workshop backend reset status
-		if [ ! -x "$HOME/reset-$w" ]; then
+		if [ ! -x "$HOME/scripts/reset-$w" ]; then
 			echo "Unable to reset backend for workshop $w, no script available"
 			exit -1
 		else
         		echo "Reseting workshop $w Backend"
-			$HOME/reset-$w
+			$HOME/scripts/reset-$w
 		fi
 		if [ _"$stddir" != _"" ]; then
 			echo "Erasing target student dir $stddir content"
-			sudo rm -rf $stddir/*
+			rm -rf $stddir/*
 		fi
 
 		# API call TBD (active or assigned ?)
