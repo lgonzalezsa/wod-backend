@@ -189,7 +189,7 @@ if [ $action != "RESET" ]; then
 				rm -rf $stddir/*
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook $HOME/scripts/ansible_copy_folder.yml -i $HOME/scripts/inventory -e "dir=  workshop=$w myrange=$stdid"
+			ansible-playbook $HOME/ansible-jupyter/ansible_copy_folder.yml -i $HOME/ansible-jupyter/inventory -e "dir=  workshop=$w myrange=$stdid"
 		fi
 
 		# Increment the student ID by Number of jupyter students in students table
