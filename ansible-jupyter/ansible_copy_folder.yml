@@ -4,47 +4,51 @@
   #connection: local
   vars:
     # Change this to the number of copies you want
-    capacity: 0
+    #capacity: 0
     prefix: /student
     ref: /home/jupyter/student0
-    workshop: OVWorkshop
+    playbk: /home/jupyter/ansible-jupyter
+    #workshop: OVWorkshop
     #dir: TSS
-    myrange: 1-{{capacity}}
-    parse: "{{ myrange.split('-') }}"
-    start: "{{parse[0]}}"
-    end: "{% if parse|length > 1 %}{{parse[1]}}{% else %}{{start}}{% endif %}"
-    files: []
+    #myrange: 1-{{ capacity }}
+    #parse: "{{ myrange.split('-') }}"
+    #start: "{{ parse[0] }}"
+    #end: "{% if parse|length > 1 %}{{ parse[1] }}{% else %}{{ start }}{% endif %}"
+    #files: []
 
   tasks: 
     - fail:
-        msg: workshop variable is empty ! Fat fingers ?!?
-      when: workshop|length == 0
+        msg: STDID variable is empty ! Fat fingers ?!?
+      when: STDID is not defined
+
+    - fail:
+        msg: WORKSHOP variable is empty ! Fat fingers ?!?
+      when: WORKSHOP is not defined
 
     - name: check variables file exists
       stat:
-        path: variables_{{workshop}}.yml
+        path: "{{ playbk }}/variables_{{ WORKSHOP }}.yml"
       register: variables_file
     - include_vars:
-        file: variables_{{workshop}}.yml
+        file: "{{ playbk }}/variables_{{ WORKSHOP }}.yml"
       when: variables_file.stat.exists
   
     - name: check password file exists
       stat:
-        path: variables_{{workshop}}_pass.yml
+        path: "{{ playbk }}/variables_{{ WORKSHOP }}_pass.yml"
       register: pass_file
     - include_vars:
-        file: variables_{{workshop}}_pass.yml
+        file: "{{ playbk }}/variables_{{ WORKSHOP }}_pass.yml"
       when: pass_file.stat.exists
   
     - fail:
-        msg: PASSSTU variable found but student range > 1 start = {{start}}  end = {{end}}
-      when: PASSSTU is defined and start != end
-
+        msg: PASSSTU variable is empty ! Fat fingers ?!?
+      when: PASSSTU is not defined
 
     # find all notebooks
     - name: find jupyter notebooks
       find:
-        paths: "{{ref}}/{{dir}}/{{workshop}}"
+        paths: "{{ ref }}/{{ DIR }}/{{ WORKSHOP }}"
         recurse: yes
         patterns: 
           - "*.ipynb"
@@ -54,62 +58,51 @@
 
     - name: debug
       debug: 
-        msg: "{{notebooks.files}}"
+        msg: "{{ notebooks.files }}"
 
-    - name: Cleanup Outputs, metadata and execution_count
-      shell: |
-        jq '(.cells[] | select(has("outputs")) | .outputs) = []
-        | (.cells[] | select(has("execution_count")) | .execution_count) = null
-        | .cells[].metadata = {}' "{{ item.path }}" | sponge "{{ item.path }}"
-      with_items: "{{ notebooks.files }}"
-      when: item.path is not search("Variables.ps1")
+        #   - name: Cleanup Outputs, metadata and execution_count
+        #shell: |
+        #jq '(.cells[] | select(has("outputs")) | .outputs) = []
+        #| (.cells[] | select(has("execution_count")) | .execution_count) = null
+        #| .cells[].metadata = {}' "{{ item.path }}" | sponge "{{ item.path }}"
+        #with_items: "{{ notebooks.files }}"
+        #when: item.path is not search("Variables.ps1")
  
-    # copy student0 n times to student1...studentn
-    - name: copy master folder
+    # Synchronize target students with student0 Workshop content
+    - name: synchronize master folder
+      ansible.posix.synchronize:
+        src: "{{ ref }}/{{ DIR }}/{{ WORKSHOP }}/"
+        dest: "{{ prefix }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        rsync_opts: 
+          - "--exclude=*.ipynb --exclude=Variables.ps1"
+
+      #- name: debug
+      #debug:
+      #msg: "PASSSTU:{{ PASSSTU }}"
+
+    - name: Deliver notebooks as ansible template for variable expansion
+      template:
+        src: "{{ item.path }}"
+        dest: "{{ item.path | regex_replace(ref, prefix + '/student' + STDID) }}"
+      with_items: "{{ notebooks.files }}"
+
+    - name: Adapt owner/group/modes for target workshop
       become: yes
       become_user: root
-      copy:
-        src: "{{ref}}/{{dir}}/{{workshop}}/"
-        dest: "{{prefix}}/student{{item}}/{{dir}}/{{workshop}}"
-        owner: student{{item}}
-        group: student{{item}}
+      file:
+        path: '{{ prefix }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}'
+        owner: student{{ STDID }}
+        group: student{{ STDID }}
         mode: u+rwx
-      loop: "{{range(start|int, end|int +1, 1) | list }}"
-
-    # Replace $$I with Student ID in notebooks
-    - name: student id substitution
-      replace:
-          path: "{{item.0.path | regex_replace('/'+ref+'/','/student' + item.1|string + '/')}}"
-          regexp: \$\$I
-          replace: "{{item.1}}"
-      with_nested: 
-        - "{{notebooks.files}}"
-        - "{{range(start|int, end|int +1, 1) | list }}"
-
-    - name: password substitution
-      replace:
-          path: "{{item.0.path | regex_replace('/'+ref+'/','/student' + item.1|string + '/')}}"
-          regexp: \$\$PASSSTU
-          replace: "{{PASSSTU}}"
-      with_nested: 
-        - "{{notebooks.files}}"
-        - "{{range(start|int, end|int +1, 1) | list }}"
-
-      # Replace $$variable_name with whatever is specified in variables.yml that we imported
-    - name: variables substitution
-      # debug:
-      #   msg: 
-      #     - Student{{item.2}}/{{item.0.path|basename}}
-      #     - \$\${{item.1.varname}}
-      #     - "{{ item.1.varsubst[item.2|string] }} "
-      replace:
-        path: "{{item.0.path | regex_replace('/'+ref+'/','/student' + item.2|string + '/')}}"
-        regexp: \$\${{item.1.varname}}
-        replace: "{{ item.1.varsubst[item.2|string] }}"
-      with_nested: 
-        - "{{notebooks.files}}"
-        - "{{substitutions}}"
-        - "{{range(start|int, end|int +1, 1) | list }}"
-      when: substitutions is defined
-
-
+      
+    - name: setup acl for the Workshop
+      become: yes
+      become_user: root
+      ansible.posix.acl:
+        path: "{{ prefix }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        recursive: yes
+        entity: jupyter
+        etype: user
+        permissions: rwx
+        #default: yes
+        state: present

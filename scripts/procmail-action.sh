@@ -60,17 +60,8 @@ EOF
 
 # This function creates a variable file in which password is stored fro athe ansble playbook to handle and use to substitue $$PASSWD in notebook the LDAP passwd with $randompw
 create_var_passwd() {
-
-  cat > /tmp/variables_$$.yml << EOF
----
-substitutions:
-  - varname: PASSWD
-    varsubst:
-      "$stdid": $randompw
-EOF
-  chmod 640 /tmp/variables_$$.yml
-  # TODO: Would be nice to setup a lock file
-  mv -f /tmp/variables_$$.yml $std0/variables_$w.yml
+  
+	ansible-vault encrypt_string --vault-password-file $HOME/ansible-jupyter/vault_secret $randompw --name "'PASSSTU'" > $HOME/ansible-jupyter/variables_${w}_pass.yml
 }
 
 # This function retuns the workshop name from the mail body
@@ -189,7 +180,7 @@ if [ $action != "RESET" ]; then
 				rm -rf $stddir/*
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook $HOME/ansible-jupyter/ansible_copy_folder.yml -i $HOME/ansible-jupyter/inventory -e "dir=  workshop=$w myrange=$stdid"
+			ansible-playbook $HOME/ansible-jupyter/ansible_copy_folder.yml -i $HOME/ansible-jupyter/inventory -e "DIR=  WORKSHOP=$w STDID=$stdid" --vault-password-file $HOME/ansible-jupyter/vault_secret
 		fi
 
 		# Increment the student ID by Number of jupyter students in students table
