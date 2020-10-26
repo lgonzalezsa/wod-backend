@@ -101,6 +101,7 @@
         path: '{{ prefix }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}'
         owner: student{{ STDID }}
         group: student{{ STDID }}
+        recurse: yes
         mode: u+rwx
       
     - name: setup acl for the Workshop
