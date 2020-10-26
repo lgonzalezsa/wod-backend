@@ -41,17 +41,15 @@
         file: "{{ playbk }}/variables_{{ WORKSHOP }}_pass.yml"
       when: pass_file.stat.exists
   
-    - fail:
-        msg: PASSSTU variable is empty ! Fat fingers ?!?
-      when: PASSSTU is not defined
-
     # find all notebooks
     - name: find jupyter notebooks
       find:
         paths: "{{ ref }}/{{ DIR }}/{{ WORKSHOP }}"
         recurse: yes
+        # Add other file types to process them as ansible templates
         patterns: 
           - "*.ipynb"
+          - "*.py"
           - "Variables.ps1"
         excludes: '*-checkpoint.ipynb'
       register: notebooks
@@ -59,6 +57,16 @@
     - name: debug
       debug: 
         msg: "{{ notebooks.files }}"
+
+    - name: debug
+      debug: 
+        msg: "{{ OVIP }}"
+
+    - name: debug-OVIP
+      debug: 
+        msg: "{{ item.key }} => {{ item.value }}" 
+      with_dict: "{{ OVIP }}"
+      when: "{{ STDID }} == {{ item.key }}"
 
         #   - name: Cleanup Outputs, metadata and execution_count
         #shell: |
@@ -74,7 +82,7 @@
         src: "{{ ref }}/{{ DIR }}/{{ WORKSHOP }}/"
         dest: "{{ prefix }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         rsync_opts: 
-          - "--exclude=*.ipynb --exclude=Variables.ps1"
+          - "--exclude=*.ipynb --exclude=*.py --exclude=Variables.ps1"
 
       #- name: debug
       #debug:
