@@ -249,12 +249,13 @@ elif [ "$action" = "RESET" ]; then
 	if [ _"`get_reset_status $id`" = _"true" ]; then
 		# Then call the reset script
 		# Get Workshop backend reset status
-		if [ ! -x "$HOME/scripts/reset-$w" ]; then
+		ansible-playbook $HOME/ansible-jupyter/ansible_copy_reset.yml -i $HOME/ansible-jupyter/inventory -e "DIR=  PBKDIR=$PBKDIR WORKSHOP=$w STDID=$stdid" --vault-password-file $HOME/ansible-jupyter/vault_secret
+		if [ ! -x "$HOME/scripts/reset-$w.sh.gen" ]; then
 			echo "Unable to reset backend for workshop $w, no script available"
 			exit -1
 		else
         		echo "Reseting workshop $w Backend"
-			$HOME/scripts/reset-$w
+			$HOME/scripts/reset-$w.sh.gen
 		fi
 		if [ _"$stddir" != _"" ]; then
 			echo "Erasing target student dir $stddir content"

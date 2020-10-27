@@ -1,2 +1,8 @@
 jupyterhubapi: http://jupyterhub2.hp.local:8000
 admintoken: 357f344d57d54e9882004f2d762bb920
+#
+VCENTERAPP: "vcenterapp65.hp.local"
+VCENTERADMIN: "Administrator@vsphere.local"
+VCENTERPWD: "P@ssw0rd"
+OVVMSIMU1: "HPE_OneView_DCS_5.30_Simu1"
+OVVMSIMU2: "HPE_OneView_DCS_5.30_Simu2"

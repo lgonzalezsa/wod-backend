@@ -1,2 +1,8 @@
 jupyterhubapi: http://jupyterhub.etc.fr.comm.hpecorp.net:8000
 admintoken: 70844ab826f349ee80dbfbfa2bf5f92e
+#
+VCENTERAPP: "vcenter-hpedev.etc.fr.comm.hpecorp.net"
+VCENTERADMIN: "root"
+VCENTERPWD: "vmware"
+OVVMSIMU1: "1HPEOneView-DCS_5.20.00-0419927"
+OVVMSIMU2: "2HPEOneView-DCS_5.20.00-0419927"
