@@ -1,13 +1,151 @@
 # Playbook expects to have a Student0 folder in the directory where the playbook is run
 - hosts: jupyterhub
-  gather_facts: false
+  gather_facts: true
   #connection:
   vars:
-       usermin: 1
-       usermax: 10 
+       usermin: 1001
+       usermax: 1250 
        gidbase: 2000
        uidbase: 2000
+       JPHUB: /opt/jupyterhub
   tasks: 
+    - name: check that required packages are installed
+      become: yes
+      become_user: root
+      apt:
+        pkg:
+        - apt-transport-https
+
+    - name: Update apt cache
+      become: yes
+      become_user: root
+      apt:
+        update_cache: yes
+
+    - name: Add universe repository into sources list
+      become: yes
+      become_user: root
+      apt_repository:
+        repo: deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-security universe
+        state: present
+
+    - name: Add certbot repository into sources list
+      become: yes
+      become_user: root
+      apt_repository:
+        repo: ppa:ansible/ansible
+        state: present
+
+    - name: Add certbot repository into sources list
+      become: yes
+      become_user: root
+      apt_repository:
+        repo: ppa:certbot/certbot
+        state: present
+
+    - name: Update apt cache
+      become: yes
+      become_user: root
+      apt:
+        update_cache: yes
+
+    - name: check that required packages are installed
+      become: yes
+      become_user: root
+      apt:
+        pkg:
+        - ansible 
+        - python3 
+        - python3-dev 
+        - python3-pip 
+        - python3-venv 
+        - git 
+        - curl 
+        - wget 
+        - bzip2 
+        - firefox 
+        - jq 
+        - httpie 
+        - python-jmespath 
+        - apt-file 
+        - sponge 
+        - net-tools 
+        - ldap-utils
+        - nodejs
+        - npm
+        - pandoc
+        - clang
+        - cargo
+        - cmake
+        - default-jre
+        - default-jdk
+        - golang
+        - texlive-xetex 
+        - texlive-fonts-recommended 
+        - texlive-generic-recommended
+        - powershell
+        - aspnetcore-runtime-3.1
+        - dotnet
+        - dotnet-runtime-3.1
+        - dotnet-sdk-3.1
+        - software-properties-common
+        - certbot 
+        - python-certbot-apache
+        - gnupg2 
+        - postfix 
+        - procmail 
+
+    - name: check that additional packages are installed
+      become: yes
+      become_user: root
+      apt:
+        pkg:
+        - https://packages.microsoft.com/config/ubuntu/{{ ansible_distribution_version }}/packages-microsoft-prod.deb
+
+    - name: check that directory "{{ JPHUB }}" exists
+      become: yes
+      become_user: root
+      file:
+        path: "{{ JPHUB }}"
+        state: directory
+        owner: jupyter
+        group: jupyter
+        mode: 0750
+
+    - name: install required pip packages
+      pip:
+        virtualenv: "{{ JPHUB }}"
+        name:
+        - wheel 
+        - jupyterhub 
+        - jupyterlab 
+        - nbconvert
+        - pyhpecfm==0.1.6
+        - hpeOneView
+        - ipywidgets
+        - ansible-kernel
+        - bash_kernel
+        - powershell_kernel
+        - jupyterlab_iframe
+
+    - name: Install required node.js package.
+      community.general.npm:
+        name: "{{ item }}"
+        global: yes
+      with_items:
+        - json
+        - configurable-http-proxy
+
+    - name: check that directory "{{ JPHUB }}/etc/jupyterhub" exists
+      become: yes
+      become_user: root
+      file:
+        path: "{{ JPHUB }}/etc/jupyterhub"
+        state: directory
+        owner: jupyter
+        group: jupyter
+        mode: 0750
+
     - name: check that directory /student exists
       become: yes
       become_user: root
@@ -18,7 +156,7 @@
         group: jupyter
         mode: 0711
 
-    - name: check that directory /jupyter/student0 exists
+    - name: check that directory /home/jupyter/student0 exists
       file:
         path: "/home/jupyter/student0"
         state: directory
@@ -26,6 +164,13 @@
         group: jupyter
         mode: 0750
 
+    - name: check that directory /home/jupyter/.mail exists
+      file:
+        path: "/home/jupyter/.mail"
+        state: directory
+        owner: jupyter
+        group: jupyter
+        mode: 0750
     
     - name: destroy existing student jupyter  users
       command: "curl -X DELETE --silent -k -H 'Authorization: token {{ admintoken }}' {{ jupyterhubapi }}/hub/api/users/{{ 'student%s' | format(item) }}"
@@ -92,6 +237,3 @@
         #default: yes
         state: present
       loop: "{{ range( usermin, usermax + 1)|list }}"
-
-
-  
