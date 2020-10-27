@@ -1,0 +1,30 @@
+# Playbook to generate instantiated reset scripts
+# # All variables in upper case come from the procmail-action.sh script
+- hosts: staging
+  gather_facts: false
+  #connection: local
+  vars:
+    # Change this to the number of copies you want
+    prefix: /student
+    ref: /home/jupyter/student0
+    scripts: /home/jupyter/scripts
+
+  tasks: 
+    - fail:
+        msg: STDID variable is empty ! Fat fingers ?!?
+      when: STDID is not defined
+
+    - fail:
+        msg: WORKSHOP variable is empty ! Fat fingers ?!?
+      when: WORKSHOP is not defined
+
+    - fail:
+        msg: PBKDIR variable is empty ! Fat fingers ?!?
+      when: PBKDIR is not defined
+
+    - name: Deliver reset scripts as ansible template for variable expansion
+      template:
+        src: "{{ item }}"
+        dest: "{{ item }}.gen"
+        mode: 0755
+      with_fileglob: [ '{{ scripts }}/reset-*.sh' ]
