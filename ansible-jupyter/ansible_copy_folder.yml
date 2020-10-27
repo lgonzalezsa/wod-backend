@@ -1,4 +1,5 @@
 # Playbook expects to have a Student0 folder in the directory where the playbook is run
+# # All variables in upper case come from the procmail-action.sh script
 - hosts: staging
   gather_facts: false
   #connection: local
@@ -7,7 +8,7 @@
     #capacity: 0
     prefix: /student
     ref: /home/jupyter/student0
-    playbk: /home/jupyter/ansible-jupyter
+    playbk: /home/jupyter/ansible-jupyter/{{ PBKDIR }}
     #workshop: OVWorkshop
     #dir: TSS
     #myrange: 1-{{ capacity }}
@@ -24,6 +25,10 @@
     - fail:
         msg: WORKSHOP variable is empty ! Fat fingers ?!?
       when: WORKSHOP is not defined
+
+    - fail:
+        msg: PBKDIR variable is empty ! Fat fingers ?!?
+      when: PBKDIR is not defined
 
     - name: check variables file exists
       stat:
@@ -58,15 +63,20 @@
       debug: 
         msg: "{{ notebooks.files }}"
 
-    - name: debug
-      debug: 
-        msg: "{{ OVIP }}"
+        #- name: debug
+        #debug: 
+        #msg: "{{ ansible_facts }}"
 
-    - name: debug-OVIP
-      debug: 
-        msg: "{{ item.key }} => {{ item.value }}" 
-      with_dict: "{{ OVIP }}"
-      when: "{{ STDID }} == {{ item.key }}"
+
+        #- name: debug
+        #debug: 
+        #msg: "{{ OVIP }}"
+
+        #- name: debug-OVIP
+        #debug: 
+        #msg: "{{ item.key }} => {{ item.value }}" 
+        #with_dict: "{{ OVIP }}"
+        #when: "{{ STDID }} == {{ item.key }}"
 
         #   - name: Cleanup Outputs, metadata and execution_count
         #shell: |

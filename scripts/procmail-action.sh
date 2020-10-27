@@ -61,7 +61,7 @@ EOF
 # This function creates a variable file in which password is stored fro athe ansble playbook to handle and use to substitue $$PASSWD in notebook the LDAP passwd with $randompw
 create_var_passwd() {
   
-	ansible-vault encrypt_string --vault-password-file $HOME/ansible-jupyter/vault_secret $randompw --name "'PASSSTU'" > $HOME/ansible-jupyter/variables_${w}_pass.yml
+	ansible-vault encrypt_string --vault-password-file $HOME/ansible-jupyter/vault_secret $randompw --name "'PASSSTU'" > $HOME/ansible-jupyter/$PBKDIR/variables_${w}_pass.yml
 }
 
 # This function retuns the workshop name from the mail body
@@ -95,18 +95,21 @@ if [ _"`hostname -s`" = _"jupyterhub2" ]; then
 	# Base for student IDs is 800 for Grenoble, 0 for Mougins
 	BASESTDID=800
 	LDAPSRV=ldapsrv02.hp.local
+	PBKDIR="sandbox"
 elif [ _"`hostname -s`" = _"jupyterhub" ]; then
         JUPYTERHUBAPI="http://jupyterhub.etc.fr.comm.hpecorp.net:8000"
 	JUPYTERHUBTOKEN="f75c13f965704630bdb0af023c5da72b"
 	# Base for student IDs is 800 for Grenoble, 0 for Mougins
 	BASESTDID=0
 	LDAPSRV=ldapsrv02.hpedevlab.net
+	PBKDIR="prod"
 elif [ _"`hostname -s`" = _"jupyterhub3" ]; then
         JUPYTERHUBAPI="http://jupyterhub3.etc.fr.comm.hpecorp.net:8000"
 	JUPYTERHUBTOKEN="70fe9e91e8004cc4b9df2ee0ff7a1c14"
 	# Base for student IDs is 800 for Grenoble, 0 for Mougins
 	BASESTDID=0
 	LDAPSRV=ldapsrv02.hpedevlab.net
+	PBKDIR="staging"
 else
 	echo "This machine is not a jupyterhub machine"
 	exit -1
@@ -180,7 +183,7 @@ if [ $action != "RESET" ]; then
 				rm -rf $stddir/*
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook $HOME/ansible-jupyter/ansible_copy_folder.yml -i $HOME/ansible-jupyter/inventory -e "DIR=  WORKSHOP=$w STDID=$stdid" --vault-password-file $HOME/ansible-jupyter/vault_secret
+			ansible-playbook $HOME/ansible-jupyter/ansible_copy_folder.yml -i $HOME/ansible-jupyter/inventory -e "DIR=  PBKDIR=$PBKDIR WORKSHOP=$w STDID=$stdid" --vault-password-file $HOME/ansible-jupyter/vault_secret
 		fi
 
 		# Increment the student ID by Number of jupyter students in students table
