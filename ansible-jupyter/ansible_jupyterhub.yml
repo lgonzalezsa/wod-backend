@@ -8,7 +8,64 @@
        gidbase: 2000
        uidbase: 2000
        JPHUB: /opt/jupyterhub
+
   tasks: 
+    - name: Ensure correct limits
+      become: yes
+      become_user: root
+      lineinfile:
+        path: /etc/security/limits.conf
+        line: "{{ item }}"
+        owner: root
+        group: root
+        mode: '0644'
+      with_items:
+        - "@jupyter soft nproc 64000"
+        - "@jupyter hard nproc 64000"
+
+    - name: Setup firewall rules
+      rule: allow
+      port: "{{ item }}"
+      proto: tcp
+      with_items:
+        - 8000
+        - 443
+        - 80
+
+    - name: Replace a localhost entry with our own
+      become: yes
+      become_user: root
+      lineinfile:
+        path: /etc/hosts
+        regexp: '^127\.0\.0\.1'
+        line: 127.0.0.1 localhost localhost.localdomain
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Ensure we have relevant entries in /etc/hosts
+      become: yes
+      become_user: root
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ item }}"
+        owner: root
+        group: root
+        mode: '0644'
+      with_items:
+        - "16.31.85.201 jupyterhub3.etc.fr.comm.hpecorp.net jupyterhub3 notebooks3.hpedev.io notebooks3"
+        - "15.196.54.22 jupyterhub2.etc.fr.comm.hpecorp.net jupyterhub2 notebooks2.hpedev.io notebooks2"
+        - "16.31.85.200 jupyterhub.etc.fr.comm.hpecorp.net jupyterhub notebooks.hpedev.io notebooks"
+        # Used by Francois for Redfish notebooks
+        - "16.31.87.207 ilo5"
+        # Virtual Machine containing Francois' OpenBMCs simulators
+        - "16.31.86.70  openbmcs"
+        - "16.31.86.231 cfmtest.local"
+        - "16.31.84.41 controller.hpedevlab.net controller1.etc.fr.comm.hpecorp.net"
+        - "16.31.84.38 controller2.hpedevlab.net controller2.etc.fr.comm.hpecorp.net"
+        - "16.31.84.46 gateway1.hpedevlab.net gateway1.etc.fr.comm.hpecorp.net"
+        - "16.31.84.37 gateway2.hpedevlab.net gateway2.etc.fr.comm.hpecorp.net"
+"
     - name: check that required packages are installed
       become: yes
       become_user: root
@@ -145,6 +202,23 @@
         owner: jupyter
         group: jupyter
         mode: 0750
+
+    - name: Install jupyterhub systemd service file
+      become: yes
+      become_user: root
+      file: 
+        src: "{{ lookup('env','HOME') }}/ansible-jupyter/jupyterhub.service"
+        dest: "/etc/systemd/system/jupyterhub.service"
+        owner: jupyter
+        group: jupyter
+        mode: 0755
+
+    - name: Enable jupyterhub service 
+      systemd:
+        state: started
+        daemon_reload: yes
+        enabled: yes
+        name: jupyterhub
 
     - name: check that directory /student exists
       become: yes
