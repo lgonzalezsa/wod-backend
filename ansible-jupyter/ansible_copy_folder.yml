@@ -114,7 +114,7 @@
         recurse: yes
         mode: u+rwx
       
-    - name: setup acl for the Workshop
+    - name: setup ACL for the Workshop
       become: yes
       become_user: root
       ansible.posix.acl:
@@ -123,5 +123,16 @@
         entity: jupyter
         etype: user
         permissions: rwx
-        #default: yes
+        state: present
+      
+    - name: setup default ACL for the Workshop
+      become: yes
+      become_user: root
+      ansible.posix.acl:
+        path: "{{ prefix }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        recursive: yes
+        entity: jupyter
+        etype: user
+        permissions: rwx
+        default: yes
         state: present

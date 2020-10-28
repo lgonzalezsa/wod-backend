@@ -299,7 +299,7 @@
       command: "curl -X POST --silent -k -H 'Authorization: token {{ admintoken }}' {{ jupyterhubapi }}/hub/api/users/{{ 'student%s' | format(item) }}"
       loop: "{{ range( usermin, usermax + 1)|list }}"
 
-    - name: setup studentx acl for jupyter
+    - name: setup ACL for studentx with jupyter account
       become: yes
       become_user: root
       ansible.posix.acl:
@@ -308,6 +308,18 @@
         entity: jupyter
         etype: user
         permissions: rwx
-        #default: yes
+        state: present
+      loop: "{{ range( usermin, usermax + 1)|list }}"
+
+    - name: setup default ACL for studentx with jupyter account
+      become: yes
+      become_user: root
+      ansible.posix.acl:
+        path: "/student/{{ 'student%s' | format(item) }}"
+        recursive: yes
+        entity: jupyter
+        etype: user
+        permissions: rwx
+        default: yes
         state: present
       loop: "{{ range( usermin, usermax + 1)|list }}"
