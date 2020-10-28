@@ -79,6 +79,16 @@ get_workshop_name() {
 	echo "$w"
 }
 
+erase_student() {
+
+	if [ _"$stddir" != _"" ]; then
+		echo "Erasing target student dir $stddir content"
+		rm -rf $stddir/*
+		# For now we need to be root to suppress these dirs
+		sudo rm -rf $stddir/.local $stddir/.config
+		find $stddir -name '.??*' -a ! -name .bashrc -a ! -name .profile -a ! -name .bash_logout -print0 | xargs -0 rm -rf
+	fi
+}
 #
 # Main part
 #
@@ -178,10 +188,7 @@ if [ $action != "RESET" ]; then
 		fi
 
 		if [ "$action" = "CREATE" ]; then
-			if [ _"$stddir" != _"" ]; then
-				echo "Erasing target student dir $stddir content"
-				rm -rf $stddir/*
-			fi
+			erase_student
 			echo "Copying workshop $w content into target student dir $stddir"
 			ansible-playbook $HOME/ansible-jupyter/ansible_copy_folder.yml -i $HOME/ansible-jupyter/inventory -e "DIR=  PBKDIR=$PBKDIR WORKSHOP=$w STDID=$stdid" --vault-password-file $HOME/ansible-jupyter/vault_secret
 		fi
@@ -220,10 +227,7 @@ if [ $action != "RESET" ]; then
 			#Get Worshop reset status to determine if users should be updated to inactive or not
 			if [ _"`get_reset_status $id`" = _"false" ]; then
 				# Possible to clean dirs because no RESET so no file needed in that dir
-				if [ _"$stddir" != _"" ]; then
-					echo "Erasing target student dir $stddir content"
-					rm -rf $stddir/*
-				fi
+				erase_student
 				##Update customer status to inactive
 				curl --header "Content-Type: application/json" \
   					--request PUT \
@@ -257,10 +261,7 @@ elif [ "$action" = "RESET" ]; then
         		echo "Reseting workshop $w Backend"
 			$HOME/scripts/reset-$w.sh.gen
 		fi
-		if [ _"$stddir" != _"" ]; then
-			echo "Erasing target student dir $stddir content"
-			rm -rf $stddir/*
-		fi
+		erase_student
 
 		# API call TBD (active or assigned ?)
 		min=`echo $stdid | cut -d, -f1`
