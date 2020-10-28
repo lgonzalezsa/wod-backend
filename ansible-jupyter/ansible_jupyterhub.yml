@@ -24,6 +24,8 @@
         - "@jupyter hard nproc 64000"
 
     - name: Setup firewall rules
+      become: yes
+      become_user: root
       rule: allow
       port: "{{ item }}"
       proto: tcp
@@ -53,19 +55,16 @@
         group: root
         mode: '0644'
       with_items:
-        - "16.31.85.201 jupyterhub3.etc.fr.comm.hpecorp.net jupyterhub3 notebooks3.hpedev.io notebooks3"
-        - "15.196.54.22 jupyterhub2.etc.fr.comm.hpecorp.net jupyterhub2 notebooks2.hpedev.io notebooks2"
         - "16.31.85.200 jupyterhub.etc.fr.comm.hpecorp.net jupyterhub notebooks.hpedev.io notebooks"
-        # Used by Francois for Redfish notebooks
-        - "16.31.87.207 ilo5"
-        # Virtual Machine containing Francois' OpenBMCs simulators
-        - "16.31.86.70  openbmcs"
-        - "16.31.86.231 cfmtest.local"
-        - "16.31.84.41 controller.hpedevlab.net controller1.etc.fr.comm.hpecorp.net"
-        - "16.31.84.38 controller2.hpedevlab.net controller2.etc.fr.comm.hpecorp.net"
-        - "16.31.84.46 gateway1.hpedevlab.net gateway1.etc.fr.comm.hpecorp.net"
-        - "16.31.84.37 gateway2.hpedevlab.net gateway2.etc.fr.comm.hpecorp.net"
-"
+        - "16.31.85.201 jupyterhub3.etc.fr.comm.hpecorp.net jupyterhub3 notebooks3.hpedev.io notebooks3"
+        - "192.168.10.127 jupyterhub2.etc.fr.comm.hpecorp.net jupyterhub2 notebooks2.hpedev.io notebooks2"
+        - "{{ REDFISHILO }}"
+        - "{{ REDFISHOBMC }}"
+        - "{{ HPEECPCTRL1 }}"
+        - "{{ HPEECPCTRL2 }}"
+        - "{{ HPEECPGW1 }}"
+        - "{{ HPEECPGW2 }}"
+
     - name: check that required packages are installed
       become: yes
       become_user: root
@@ -86,18 +85,11 @@
         repo: deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-security universe
         state: present
 
-    - name: Add certbot repository into sources list
+    - name: Add ansible repository into sources list
       become: yes
       become_user: root
       apt_repository:
         repo: ppa:ansible/ansible
-        state: present
-
-    - name: Add certbot repository into sources list
-      become: yes
-      become_user: root
-      apt_repository:
-        repo: ppa:certbot/certbot
         state: present
 
     - name: Update apt cache
@@ -186,6 +178,8 @@
         - jupyterlab_iframe
 
     - name: Install required node.js package.
+      become: yes
+      become_user: root
       community.general.npm:
         name: "{{ item }}"
         global: yes
@@ -214,6 +208,8 @@
         mode: 0755
 
     - name: Enable jupyterhub service 
+      become: yes
+      become_user: root
       systemd:
         state: started
         daemon_reload: yes
@@ -245,7 +241,18 @@
         owner: jupyter
         group: jupyter
         mode: 0750
-    
+   
+    - name: lockdown /home
+      become: yes
+      become_user: root
+      file:
+        path: "/home"
+        state: directory
+        owner: root
+        group: root
+        mode: 0711
+
+ 
     - name: destroy existing student jupyter  users
       command: "curl -X DELETE --silent -k -H 'Authorization: token {{ admintoken }}' {{ jupyterhubapi }}/hub/api/users/{{ 'student%s' | format(item) }}"
       loop: "{{ range( usermin, usermax + 1)|list }}"

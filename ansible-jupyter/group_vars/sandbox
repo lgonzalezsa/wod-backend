@@ -6,3 +6,11 @@ VCENTERADMIN: "Administrator@vsphere.local"
 VCENTERPWD: "P@ssw0rd"
 OVVMSIMU1: "HPE_OneView_DCS_5.30_Simu1"
 OVVMSIMU2: "HPE_OneView_DCS_5.30_Simu2"
+# Used by Francois for Redfish notebooks
+REDFISHILO: "192.168.10.5 ilo5"
+# Virtual Machine containing Francois' OpenBMCs simulators
+REDFISHOBMC: "192.168.10.70  openbmcs"
+HPEECPCTRL1: "192.168.10.220 controller.hpedevlab.net controller1.etc.fr.comm.hpecorp.net"
+HPEECPCTRL2: "192.168.10.220 controller2.hpedevlab.net controller2.etc.fr.comm.hpecorp.net"
+HPEECPGW1: "192.168.10.221 gateway1.hpedevlab.net gateway1.etc.fr.comm.hpecorp.net"
+HPEECPGW2: "192.168.10.221 gateway2.hpedevlab.net gateway2.etc.fr.comm.hpecorp.net"
