@@ -122,6 +122,13 @@ elif [ _"`hostname -s`" = _"jupyterhub3" ]; then
 	BASESTDID=0
 	LDAPSRV=ldapsrv02.hpedevlab.net
 	PBKDIR="staging"
+elif [ _"`hostname -s`" = _"jupyterhubtest" ]; then
+        JUPYTERHUBAPI="http://jupyterhubtest.etc.fr.comm.hpecorp.net:8000"
+	JUPYTERHUBTOKEN="70fe9e91e8004cc4b9df2ee0ff7a1c14"
+	# Base for student IDs is 800 for Grenoble, 0 for Mougins
+	BASESTDID=0
+	LDAPSRV=ldapsrv03.hpedevlab.net
+	PBKDIR="test"
 else
 	echo "This machine is not a jupyterhub machine"
 	exit -1
