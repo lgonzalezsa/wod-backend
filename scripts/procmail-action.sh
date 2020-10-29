@@ -86,7 +86,9 @@ erase_student() {
 		rm -rf $stddir/*
 		# For now we need to be root to suppress these dirs
 		sudo rm -rf $stddir/.local $stddir/.config
-		find $stddir -name '.??*' -a ! -name .bashrc -a ! -name .profile -a ! -name .bash_logout -print0 | xargs -0 rm -rf
+		find $stddir -name '.??*' -print0 | xargs -0 rm -rf
+		cp -a /etc/skel/.??* $stddir
+		sudo chown student${stdid}:student${stdid} $stddir/.??*
 	fi
 }
 #

@@ -330,3 +330,30 @@
         default: yes
         state: present
       loop: "{{ range( usermin, usermax + 1)|list }}"
+
+    - name: setup ACL mask for studentx with jupyter account
+      become: yes
+      become_user: root
+      ansible.posix.acl:
+        path: "/student/{{ 'student%s' | format(item) }}"
+        recursive: yes
+        entity: jupyter
+        etype: mask
+        permissions: rwx
+        state: present
+        recalculate_mask: no_mask
+      loop: "{{ range( usermin, usermax + 1)|list }}"
+
+    - name: setup default mask ACL for studentx with jupyter account
+      become: yes
+      become_user: root
+      ansible.posix.acl:
+        path: "/student/{{ 'student%s' | format(item) }}"
+        recursive: yes
+        entity: jupyter
+        etype: mask
+        permissions: rwx
+        default: yes
+        state: present
+        recalculate_mask: no_mask
+      loop: "{{ range( usermin, usermax + 1)|list }}"
