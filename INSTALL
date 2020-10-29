@@ -1,0 +1,157 @@
+    #OS install via ILO: using ubuntu-20.04.1-live-server-amd64.iso
+    # IP address : 
+	englisk keyboard
+	network:
+	IP address : 16.31.85.200
+	broadcast : 16.31.84.0/22
+	GW: 16.31.84.1
+	DNS: 16.31.84.24
+	search etc.fr.comm.hpecorp.net
+	Disk : manual / reformat puis use entire disk
+	no proxy
+	user creation user jupyter / P@ssw0rd
+	ssh server ok
+
+Autoinstall with ansible and sshd
+
+setup ssh
+copy ssh keys fro; another jupyterhub server
+setup sudo:
+  jupyter ALL=(ALL) NOPASSWD:ALL
+copy .gitconfig & .git/config
+launch scripts/install-jupyter.sh
+
+in /etc/security/limits.conf
+@jupyter         hard    nofile          65536
+@jupyter         soft    nofile          65536
+@jupyter         hard    nproc           800000
+@jupyter         soft    nproc           800000
+
+
+# To avoid system limits
+in ~jupyter/.bashrc
+
+ulimit -u 641465
+ulimit -n 65535
+
+
+# Increase limits for jupyter
+net.ipv4.tcp_keepalive_time=1800
+
+kernel.threads-max=4096000
+kernel.pid_max=200000
+vm.max_map_count=600000
+
+
+In /etc/systemd/logind.conf
+UserTasksMax=100000
+
+
+
+    #Install conda for the whole system
+    sudo sh -c 'curl https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc | gpg --dearmor > conda.gpg '
+    sudo install -o root -g root -m 644 conda.gpg /etc/apt/trusted.gpg.d/
+    sudo sh -c 'echo "deb [arch=amd64] https://repo.anaconda.com/pkgs/misc/debrepo/conda stable main" > /etc/apt/sources.list.d/conda.list'
+    sudo apt update
+    sudo apt install conda
+    sudo ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
+    sudo mkdir /opt/conda/envs/
+    sudo /opt/conda/bin/conda create --prefix /opt/conda/envs/python python=3.7 ipykernel
+    sudo /opt/conda/envs/python/bin/python -m ipykernel install --prefix=/opt/jupyterhub/ --name 'python' --display-name "Python (default)"
+  
+	##install bash kernel adapted from https://pypi.org/project/bash_kernel/
+	sudo /opt/jupyterhub/bin/python3 -m bash_kernel.install
+	
+	### Install EvCxR Jupyter Kernel
+	##from  https://github.com/google/evcxr/tree/master/evcxr_jupyter
+	sudo vi ~/.bashrc
+	# Rust Kernel req for jupyter
+	export PATH=$PATH:/home/jupyter/.cargo/bin
+	##install kernel
+	cargo install evcxr_jupyter
+	/home/jupyter/.cargo/bin/evcxr_jupyter --install
+	evcxr_jupyter --install
+	##System wide:
+	sudo mv .local/share/jupyter/kernels/rust /opt/jupyterhub/share/jupyter/kernels/
+
+	### Install Java Kernel
+	#install from https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-on-ubuntu-18-04-fr
+	#Definition Java$Home
+	sudo update-alternatives --config java
+	#Install Java kernel from  https://github.com/SpencerPark/IJava
+	#Download the release from the releases tab. A prepackaged distribution will be in an artifact named ijava-$version.zip AND unzip it into a temporary location. It should have at least the install.py and java folder extracted in there.
+	cd /
+	mkdir test
+	cd test
+	wget https://github.com/SpencerPark/IJava/releases/download/v1.3.0/ijava-1.3.0.zip
+	unzip ijava-1.3.0.zip
+	#Run the installer with the same python command used to install jupyter. The installer is a python script and has the same options as jupyter kernelspec install but additionally supports configuring some of the kernel properties mentioned further below in the README.
+	sudo /opt/jupyterhub/bin/python3 install.py
+	#Result is: 
+	Installed java kernel into "/usr/local/share/jupyter/kernels/java"
+
+
+	### Install Go Kernel
+	# Install go first https://linuxize.com/post/how-to-install-go-on-ubuntu-18-04/
+	#dowload go :
+	# BCO: do we need 1.15 vs std 1.10 ?
+	wget https://golang.org/dl/go1.15.2.linux-amd64.tar.gz
+	#extract to /usr/local directory:
+	sudo tar -C /usr/local -xzf go1.13.linux-amd64.tar.gz
+	#Adjusting the Path Variable
+	#In order for the system to know where to find the Go executable binaries, we need to adjust the $PATH environment variable. We can do this by appending the following line to the /etc/profile file (for a system-wide installation) or the $HOME/.profile file (for a current user installation):
+	#edit  ~/.profile
+	vi ~/.profile
+	#add the following lines at the end
+	export PATH=$PATH:/usr/local/go/bin
+	#save teh file wq!
+	source ~/.profile
+	#Verifying the Go Installation 
+	go version
+	
+	#Install go kernel
+	env GO111MODULE=on go get github.com/gopherdata/gophernotes
+	cd 
+	sudo mkdir -p /usr/local/share/jupyter/kernels/gophernotes
+	cd /usr/local/share/jupyter/kernels/gophernotes
+ 	sudo cp "$(go env GOPATH)"/pkg/mod/github.com/gopherdata/gophernotes@v0.7.1/kernel/*  "."
+	sudo chmod +w ./kernel.json # in case copied kernel.json has no write permission
+	sudo sed "s|gophernotes|$(go env GOPATH)/bin/gophernotes|" < kernel.json.in > kernel.json
+	
+	
+	
+	## Install powershell for jupyter notebooks from https://github.com/vors/jupyter-powershell
+	# Notebook 
+	sudo /opt/jupyterhub/bin/python3 -m powershell_kernel.install
+	
+	# ubuntu 20.04
+  285  dotnet tool install -g powershell
+
+#ien symbolique en tant que root
+ln -sf ~jupyter/.dotnet/tools/pwsh /usr/local/bin
+
+
+	install  powershell modules :
+	pwsh
+	Install-Module -Name HPOneView.520 -RequiredVersion 5.20.2422.3962
+	Install-Module -Name HPEOneView.530 -RequiredVersion 5.30.2472.1534
+	Install-Module -Name HPEOneView.540 -RequiredVersion 5.40.2534.2926
+    
+
+    ## optionnal install iframe to launch url from jupyter
+    cd /opt/jupyterhub/bin/
+    sudo ./jupyter-labextension install jupyterlab_iframe
+    sudo ./jupyter-serverextension enable --py jupyterlab_iframe
+
+	
+	##ansible kernel from https://github.com/ansible/ansible-jupyter-kernel
+	sudo /opt/jupyterhub/bin/python3 -m ansible_kernel.install
+	
+###install kubectl
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
+sudo apt-get install -y kubectl
+
+
+mailserver name:  
+etc/postfix/main.cf

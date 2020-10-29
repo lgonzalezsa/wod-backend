@@ -1,38 +1,44 @@
 # Playbook expects to have a Student0 folder in the directory where the playbook is run
-- hosts: jupyterhub
+- hosts: test
   gather_facts: true
   #connection:
   vars:
-       usermin: 1001
-       usermax: 1250 
-       gidbase: 2000
-       uidbase: 2000
-       JPHUB: /opt/jupyterhub
+    usermin: 1001
+    usermax: 1250 
+    gidbase: 2000
+    uidbase: 2000
+    JPHUB: /opt/jupyterhub
 
   tasks: 
-    - name: Ensure correct limits
+    - name: Ensure correct soft limits
       become: yes
       become_user: root
-      lineinfile:
-        path: /etc/security/limits.conf
-        line: "{{ item }}"
-        owner: root
-        group: root
-        mode: '0644'
-      with_items:
-        - "@jupyter soft nproc 64000"
-        - "@jupyter hard nproc 64000"
+      community.general.pam_limits:
+        domain: jupyter
+        limit_type: soft
+        limit_item: nproc
+        value: "64000"
+
+    - name: Ensure correct hard limits
+      become: yes
+      become_user: root
+      community.general.pam_limits:
+        domain: jupyter
+        limit_type: hard
+        limit_item: nproc
+        value: "64000"
 
     - name: Setup firewall rules
       become: yes
       become_user: root
-      rule: allow
-      port: "{{ item }}"
-      proto: tcp
+      community.general.ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
       with_items:
-        - 8000
-        - 443
-        - 80
+        - "8000"
+        - "443"
+        - "80"
 
     - name: Replace a localhost entry with our own
       become: yes
@@ -85,18 +91,22 @@
         repo: deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-security universe
         state: present
 
-    - name: Add ansible repository into sources list
-      become: yes
-      become_user: root
-      apt_repository:
-        repo: ppa:ansible/ansible
-        state: present
-
     - name: Update apt cache
       become: yes
       become_user: root
       apt:
         update_cache: yes
+
+        #    - name: download additional packages are installed
+        #get_url:
+        #url: https://packages.microsoft.com/config/ubuntu/{{ ansible_distribution_version }}/packages-microsoft-prod.deb
+        #dest: /tmp/packages-microsoft-prod.deb
+
+    - name: check that additional packages are installed
+      become: yes
+      become_user: root
+      apt:
+        deb: https://packages.microsoft.com/config/ubuntu/{{ ansible_distribution_version }}/packages-microsoft-prod.deb
 
     - name: check that required packages are installed
       become: yes
@@ -108,6 +118,8 @@
         - python3-dev 
         - python3-pip 
         - python3-venv 
+        - python3-jmespath 
+        - python3-virtualenv 
         - git 
         - curl 
         - wget 
@@ -115,9 +127,8 @@
         - firefox 
         - jq 
         - httpie 
-        - python-jmespath 
         - apt-file 
-        - sponge 
+        - moreutils 
         - net-tools 
         - ldap-utils
         - nodejs
@@ -131,25 +142,48 @@
         - golang
         - texlive-xetex 
         - texlive-fonts-recommended 
-        - texlive-generic-recommended
-        - powershell
+        - texlive-latex-recommended
         - aspnetcore-runtime-3.1
-        - dotnet
         - dotnet-runtime-3.1
         - dotnet-sdk-3.1
         - software-properties-common
-        - certbot 
-        - python-certbot-apache
         - gnupg2 
         - postfix 
         - procmail 
 
-    - name: check that additional packages are installed
+    - name: Install required node.js package.
       become: yes
       become_user: root
-      apt:
-        pkg:
-        - https://packages.microsoft.com/config/ubuntu/{{ ansible_distribution_version }}/packages-microsoft-prod.deb
+      community.general.npm:
+        name: "{{ item }}"
+        global: yes
+      with_items:
+        - json
+        - configurable-http-proxy
+
+    - name: remove existing pip packages
+      pip:
+        name:
+        - wheel 
+        - jupyterhub 
+        - jupyterlab 
+        - nbconvert
+        - pyhpecfm==0.1.6
+        - hpeOneView
+        - ipywidgets
+        - ansible-kernel
+        - bash_kernel
+        - powershell_kernel
+        - jupyterlab_iframe
+        state: absent
+        virtualenv: "{{ JPHUB }}"
+
+    - name: Remove directory "{{ JPHUB }}"
+      become: yes
+      become_user: root
+      file:
+       path: "{{ JPHUB }}"
+       state: absent
 
     - name: check that directory "{{ JPHUB }}" exists
       become: yes
@@ -163,7 +197,6 @@
 
     - name: install required pip packages
       pip:
-        virtualenv: "{{ JPHUB }}"
         name:
         - wheel 
         - jupyterhub 
@@ -176,16 +209,7 @@
         - bash_kernel
         - powershell_kernel
         - jupyterlab_iframe
-
-    - name: Install required node.js package.
-      become: yes
-      become_user: root
-      community.general.npm:
-        name: "{{ item }}"
-        global: yes
-      with_items:
-        - json
-        - configurable-http-proxy
+        virtualenv: "{{ JPHUB }}"
 
     - name: check that directory "{{ JPHUB }}/etc/jupyterhub" exists
       become: yes
@@ -197,15 +221,21 @@
         group: jupyter
         mode: 0750
 
-    - name: Install jupyterhub systemd service file
-      become: yes
-      become_user: root
-      file: 
-        src: "{{ lookup('env','HOME') }}/ansible-jupyter/jupyterhub.service"
-        dest: "/etc/systemd/system/jupyterhub.service"
-        owner: jupyter
-        group: jupyter
-        mode: 0755
+    - name: Generate jupyterhub configuration
+      command: "{{ JPHUB }}/bin/jupyterhub --generate-config"
+      args:
+        chdir: "{{ JPHUB }}/etc/jupyterhub/"
+
+    - name: Adapt jupyterhub configuration file
+      blockinfile:
+        path: "{{ JPHUB }}/etc/jupyterhub/jupyterhub_config.py"
+        block: |
+          #####################################################################################
+          c.Authenticator.admin_users = {'jupyter'}
+          c.Authenticator.whitelist = {'jupyter'}
+          c.Spawner.default_url = '/lab'
+          c.JupyterHub.tornado_settings = {'cookie_options': {'expires_days': 0.17}}
+          #####################################################################################
 
     - name: Enable jupyterhub service 
       become: yes
@@ -252,6 +282,9 @@
         group: root
         mode: 0711
 
+    - fail:
+        msg: Stopping for now
+        when: /bin/true
  
     - name: destroy existing student jupyter  users
       command: "curl -X DELETE --silent -k -H 'Authorization: token {{ admintoken }}' {{ jupyterhubapi }}/hub/api/users/{{ 'student%s' | format(item) }}"
