@@ -12,6 +12,9 @@ jupyterhub.etc.fr.comm.hpecorp.net
 [sandbox]
 jupyterhub2.hp.local
 
+[test]
+jupyterhubtest.etc.fr.comm.hpecorp.net
+
 [localhost]
 127.0.0.1  ansible_connection=local
 
