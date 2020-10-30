@@ -14,46 +14,19 @@
 
 Autoinstall with ansible and sshd
 
+setup jupyter account
 setup ssh
-copy ssh keys fro; another jupyterhub server
+copy ssh keys from another jupyterhub server
 setup sudo:
   jupyter ALL=(ALL) NOPASSWD:ALL
 copy .gitconfig & .git/config
 launch scripts/install-jupyter.sh
 
-in /etc/security/limits.conf
-@jupyter         hard    nofile          65536
-@jupyter         soft    nofile          65536
-@jupyter         hard    nproc           800000
-@jupyter         soft    nproc           800000
 
-
-# To avoid system limits
-in ~jupyter/.bashrc
-
-ulimit -u 641465
-ulimit -n 65535
-
-
-# Increase limits for jupyter
-net.ipv4.tcp_keepalive_time=1800
-
-kernel.threads-max=4096000
-kernel.pid_max=200000
-vm.max_map_count=600000
-
-
-In /etc/systemd/logind.conf
-UserTasksMax=100000
-
-
+#### OLD ####
+Priorities: bash, powershell, ansible, rust, java, go
 
     #Install conda for the whole system
-    sudo sh -c 'curl https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc | gpg --dearmor > conda.gpg '
-    sudo install -o root -g root -m 644 conda.gpg /etc/apt/trusted.gpg.d/
-    sudo sh -c 'echo "deb [arch=amd64] https://repo.anaconda.com/pkgs/misc/debrepo/conda stable main" > /etc/apt/sources.list.d/conda.list'
-    sudo apt update
-    sudo apt install conda
     sudo ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
     sudo mkdir /opt/conda/envs/
     sudo /opt/conda/bin/conda create --prefix /opt/conda/envs/python python=3.7 ipykernel

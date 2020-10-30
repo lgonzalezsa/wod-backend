@@ -10,23 +10,56 @@
     JPHUB: /opt/jupyterhub
 
   tasks: 
-    - name: Ensure correct soft limits
+    - name: Ensure correct nproc soft limits
       become: yes
       become_user: root
       community.general.pam_limits:
         domain: jupyter
         limit_type: soft
         limit_item: nproc
-        value: "64000"
+        value: "800000"
 
-    - name: Ensure correct hard limits
+    - name: Ensure correct nproc hard limits
       become: yes
       become_user: root
       community.general.pam_limits:
         domain: jupyter
         limit_type: hard
         limit_item: nproc
-        value: "64000"
+        value: "800000"
+
+    - name: Ensure correct nofile soft limits
+      become: yes
+      become_user: root
+      community.general.pam_limits:
+        domain: jupyter
+        limit_type: soft
+        limit_item: nofile
+        value: "65535"
+
+    - name: Ensure correct nofile hard limits
+      become: yes
+      become_user: root
+      community.general.pam_limits:
+        domain: jupyter
+        limit_type: hard
+        limit_item: nofile
+        value: "65535"
+
+    - name: Setup sysctl params
+      become: yes
+      become_user: root
+      ansible.posix.sysctl:
+        name: "{{ item.1 }}"
+        value: "{{ item.2 }}"
+        state: present
+        reload: yes
+        sysctl_set: yes
+      with_items:
+        - { "net.ipv4.tcp_keepalive_time","1800" }
+        - { "kernel.threads-max","4096000" }
+        - { "kernel.pid_max","200000" }
+        - { "vm.max_map_count","600000" }
 
     - name: Setup firewall rules
       become: yes
@@ -40,6 +73,22 @@
         - "443"
         - "80"
 
+    - name: Ensure limits are correct for jupyter account
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.bashrc"
+        line: "{{ item }}"
+      with_items:
+        - "ulimit -u 641465"
+        - "ulimit -n 65535"
+
+    - name: setup longd.conf
+      become: yes
+      become_user: root
+      lineinfile:
+        path: /etc/systemd/logind.conf
+        line: UserTasksMax=100000
+        state: present
+
     - name: Replace a localhost entry with our own
       become: yes
       become_user: root
@@ -50,6 +99,7 @@
         owner: root
         group: root
         mode: '0644'
+        state: present
 
     - name: Ensure we have relevant entries in /etc/hosts
       become: yes
@@ -60,6 +110,7 @@
         owner: root
         group: root
         mode: '0644'
+        state: present
       with_items:
         - "16.31.85.200 jupyterhub.etc.fr.comm.hpecorp.net jupyterhub notebooks.hpedev.io notebooks"
         - "16.31.85.201 jupyterhub3.etc.fr.comm.hpecorp.net jupyterhub3 notebooks3.hpedev.io notebooks3"
@@ -89,6 +140,24 @@
       become_user: root
       apt_repository:
         repo: deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-security universe
+        state: present
+
+    - name: Download conda GPG Key
+      get_url:
+        url: https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc
+        dest: "{{ ansible_env.HOME }}/anaconda.asc"
+        mode: '0440'
+
+    - name: Install conda GPG Key in APT
+      become: yes
+      become_user: root
+      shell: gpg --dearmor < "{{ ansible_env.HOME }}/anaconda.asc" > /etc/apt/trusted.gpg.d/conda.gpg
+
+    - name: Add conda APT repository
+      become: yes
+      become_user: root
+      apt_repository:
+        repo: deb [arch=amd64] https://repo.anaconda.com/pkgs/misc/debrepo/conda stable main
         state: present
 
     - name: Update apt cache
@@ -150,6 +219,7 @@
         - gnupg2 
         - postfix 
         - procmail 
+        - conda 
 
     - name: Install required node.js package.
       become: yes
@@ -209,7 +279,7 @@
         - bash_kernel
         - powershell_kernel
         - jupyterlab_iframe
-        virtualenv: "{{ JPHUB }}"
+          #virtualenv: "{{ JPHUB }}"
 
     - name: check that directory "{{ JPHUB }}/etc/jupyterhub" exists
       become: yes
