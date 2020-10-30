@@ -8,6 +8,7 @@
     gidbase: 2000
     uidbase: 2000
     JPHUB: /opt/jupyterhub
+    CLEAN: false
 
   tasks: 
     - name: Ensure correct nproc soft limits
@@ -50,16 +51,16 @@
       become: yes
       become_user: root
       ansible.posix.sysctl:
-        name: "{{ item.1 }}"
-        value: "{{ item.2 }}"
+        name: "{{ item.key }}"
+        value: "{{ item.value }}"
         state: present
         reload: yes
         sysctl_set: yes
       with_items:
-        - { "net.ipv4.tcp_keepalive_time","1800" }
-        - { "kernel.threads-max","4096000" }
-        - { "kernel.pid_max","200000" }
-        - { "vm.max_map_count","600000" }
+        - { key: "net.ipv4.tcp_keepalive_time", value: "1800" }
+        - { key: "kernel.threads-max", value: "4096000" }
+        - { key: "kernel.pid_max", value: "200000" }
+        - { key: "vm.max_map_count", value: "600000" }
 
     - name: Setup firewall rules
       become: yes
@@ -247,13 +248,15 @@
         - jupyterlab_iframe
         state: absent
         virtualenv: "{{ JPHUB }}"
+      when: CLEAN
 
     - name: Remove directory "{{ JPHUB }}"
       become: yes
       become_user: root
       file:
-       path: "{{ JPHUB }}"
-       state: absent
+        path: "{{ JPHUB }}"
+        state: absent
+      when: CLEAN
 
     - name: check that directory "{{ JPHUB }}" exists
       become: yes
@@ -279,7 +282,7 @@
         - bash_kernel
         - powershell_kernel
         - jupyterlab_iframe
-          #virtualenv: "{{ JPHUB }}"
+        virtualenv: "{{ JPHUB }}"
 
     - name: check that directory "{{ JPHUB }}/etc/jupyterhub" exists
       become: yes
