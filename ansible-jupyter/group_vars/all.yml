@@ -1,0 +1,5 @@
+---
+prefix: /student
+ref: "{{ ansible_env.HOME }}/student0"
+jupproc: "{{ ansible_env.HOME }}/jupyter-procmail"
+scripts: "{{ jupproc }}/scripts"

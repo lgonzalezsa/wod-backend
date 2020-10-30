@@ -1,7 +1,6 @@
 #!/bin/bash
 
-sudo chown -R jupyter:jupyter /home/student$stdid/$w
-cd /home/student$stdid/$w
+cd /student/student$stdid/$w
 echo " This script resets the HPE CP API Workshop content for:" student$stdid
 # associated to studentXY.
 ##

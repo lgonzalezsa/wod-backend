@@ -4,18 +4,7 @@
   gather_facts: false
   #connection: local
   vars:
-    # Change this to the number of copies you want
-    #capacity: 0
-    prefix: /student
-    ref: /home/jupyter/student0
-    playbk: /home/jupyter/ansible-jupyter/{{ PBKDIR }}
-    #workshop: OVWorkshop
-    #dir: TSS
-    #myrange: 1-{{ capacity }}
-    #parse: "{{ myrange.split('-') }}"
-    #start: "{{ parse[0] }}"
-    #end: "{% if parse|length > 1 %}{{ parse[1] }}{% else %}{{ start }}{% endif %}"
-    #files: []
+    playbk: "{{ jupproc }}/ansible-jupyter/{{ PBKDIR }}"
 
   tasks: 
     - fail:

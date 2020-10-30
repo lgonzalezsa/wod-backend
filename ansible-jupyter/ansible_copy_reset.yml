@@ -3,12 +3,6 @@
 - hosts: staging
   gather_facts: false
   #connection: local
-  vars:
-    # Change this to the number of copies you want
-    prefix: /student
-    ref: /home/jupyter/student0
-    scripts: /home/jupyter/scripts
-
   tasks: 
     - fail:
         msg: STDID variable is empty ! Fat fingers ?!?

@@ -135,6 +135,7 @@
       become_user: root
       apt:
         update_cache: yes
+      changed_when: False
 
     - name: Add universe repository into sources list
       become: yes
@@ -143,16 +144,12 @@
         repo: deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }}-security universe
         state: present
 
-    - name: Download conda GPG Key
-      get_url:
-        url: https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc
-        dest: "{{ ansible_env.HOME }}/anaconda.asc"
-        mode: '0440'
-
-    - name: Install conda GPG Key in APT
+    - name: Add conda GPG Key to APT
       become: yes
       become_user: root
-      shell: gpg --dearmor < "{{ ansible_env.HOME }}/anaconda.asc" > /etc/apt/trusted.gpg.d/conda.gpg
+      apt_key:
+        url: https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc
+        state: present
 
     - name: Add conda APT repository
       become: yes
@@ -161,11 +158,27 @@
         repo: deb [arch=amd64] https://repo.anaconda.com/pkgs/misc/debrepo/conda stable main
         state: present
 
+    - name: Add K8s GPG Key to APT
+      become: yes
+      become_user: root
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc//apt-key.gpg.asc
+        state: present
+
+    - name: Add K8s APT repository
+      become: yes
+      become_user: root
+      apt_repository:
+        #repo: deb https://apt.kubernetes.io/ kubernetes-{{ ansible_distribution_release }} main
+        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+
     - name: Update apt cache
       become: yes
       become_user: root
       apt:
         update_cache: yes
+      changed_when: False
 
         #    - name: download additional packages are installed
         #get_url:
@@ -221,6 +234,7 @@
         - postfix 
         - procmail 
         - conda 
+        - kubectl 
 
     - name: Install required node.js package.
       become: yes
@@ -245,10 +259,9 @@
         - ansible-kernel
         - bash_kernel
         - powershell_kernel
-        - jupyterlab_iframe
         state: absent
         virtualenv: "{{ JPHUB }}"
-      when: CLEAN
+      when: CLEAN|bool
 
     - name: Remove directory "{{ JPHUB }}"
       become: yes
@@ -256,7 +269,7 @@
       file:
         path: "{{ JPHUB }}"
         state: absent
-      when: CLEAN
+      when: CLEAN|bool
 
     - name: check that directory "{{ JPHUB }}" exists
       become: yes
@@ -281,18 +294,51 @@
         - ansible-kernel
         - bash_kernel
         - powershell_kernel
-        - jupyterlab_iframe
         virtualenv: "{{ JPHUB }}"
 
-    - name: check that directory "{{ JPHUB }}/etc/jupyterhub" exists
+    - name: install jupyter kernels
+      command: python3 -m "{{ item }}.install"
+      with_items:
+        - bash_kernel
+        - powershell_kernel
+        - ansible_kernel
+      changed_when: False
+
+    - name: test pwsh presence
+      command: ls "{{ ansible_env.HOME }}/.dotnet/tools/pwsh"
+      register: pwsh_path
+      ignore_errors: true
+      changed_when: false
+    
+    - name: install powershell through dotnet
+      command: dotnet tool install -g powershell
+      when: pwsh_path.rc != 0
+    
+    - name: Symlink useful for dotnet
       become: yes
       become_user: root
+      file:
+        src: "{{ ansible_env.HOME }}/.dotnet/tools/pwsh"
+        dest: /usr/local/bin/pwsh
+        owner: jupyter
+        group: jupyter
+        state: link
+    
+    - name: install powershell scripts
+      command: "{{ ansible_env.HOME }}/jupyter-procmail/scripts/install_PwshModules.sh"
+    
+    - name: check that directory "{{ JPHUB }}/etc/jupyterhub" exists
       file:
         path: "{{ JPHUB }}/etc/jupyterhub"
         state: directory
         owner: jupyter
         group: jupyter
         mode: 0750
+
+    - name: Remove jupyterhub configuration file
+      file:
+        path: "{{ JPHUB }}/etc/jupyterhub/jupyterhub_config.py"
+        state: absent
 
     - name: Generate jupyterhub configuration
       command: "{{ JPHUB }}/bin/jupyterhub --generate-config"
@@ -329,17 +375,17 @@
         group: jupyter
         mode: 0711
 
-    - name: check that directory /home/jupyter/student0 exists
+    - name: check that directory {{ ansible_env.HOME }}/student0 exists
       file:
-        path: "/home/jupyter/student0"
+        path: "{{ ansible_env.HOME }}"/student0"
         state: directory
         owner: jupyter
         group: jupyter
         mode: 0750
 
-    - name: check that directory /home/jupyter/.mail exists
+    - name: check that directory {{ ansible_env.HOME }}/.mail exists
       file:
-        path: "/home/jupyter/.mail"
+        path: "{{ ansible_env.HOME }}/.mail"
         state: directory
         owner: jupyter
         group: jupyter

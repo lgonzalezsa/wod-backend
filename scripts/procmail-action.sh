@@ -61,7 +61,7 @@ EOF
 # This function creates a variable file in which password is stored fro athe ansble playbook to handle and use to substitue $$PASSWD in notebook the LDAP passwd with $randompw
 create_var_passwd() {
   
-	ansible-vault encrypt_string --vault-password-file $HOME/ansible-jupyter/vault_secret $randompw --name "'PASSSTU'" > $HOME/ansible-jupyter/$PBKDIR/variables_${w}_pass.yml
+	ansible-vault encrypt_string --vault-password-file $jupproc/ansible-jupyter/vault_secret $randompw --name "'PASSSTU'" > $jupproc/ansible-jupyter/$PBKDIR/variables_${w}_pass.yml
 }
 
 # This function retuns the workshop name from the mail body
@@ -169,6 +169,7 @@ if [ $stdid -le $MIN ] ||  [ $stdid -ge $MAX ]; then
 fi
 
 stddir="/student/student$stdid"
+jupproc=$HOME/jupyter-procmail
 std0="$HOME/student0"
 export w=`get_workshop_name`
 id=`get_workshop_id $w`
@@ -199,7 +200,7 @@ if [ $action != "RESET" ]; then
 		if [ "$action" = "CREATE" ]; then
 			erase_student
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook $HOME/ansible-jupyter/ansible_copy_folder.yml -i $HOME/ansible-jupyter/inventory -e "DIR=  PBKDIR=$PBKDIR WORKSHOP=$w STDID=$stdid" --vault-password-file $HOME/ansible-jupyter/vault_secret
+			ansible-playbook $jupproc/ansible-jupyter/ansible_copy_folder.yml -i $jupproc/ansible-jupyter/inventory -e "DIR=  PBKDIR=$PBKDIR WORKSHOP=$w STDID=$stdid" --vault-password-file $jupproc/ansible-jupyter/vault_secret
 		fi
 
 		# Increment the student ID by Number of jupyter students in students table
@@ -262,13 +263,13 @@ elif [ "$action" = "RESET" ]; then
 	if [ _"`get_reset_status $id`" = _"true" ]; then
 		# Then call the reset script
 		# Get Workshop backend reset status
-		ansible-playbook $HOME/ansible-jupyter/ansible_copy_reset.yml -i $HOME/ansible-jupyter/inventory -e "DIR=  PBKDIR=$PBKDIR WORKSHOP=$w STDID=$stdid" --vault-password-file $HOME/ansible-jupyter/vault_secret
-		if [ ! -x "$HOME/scripts/reset-$w.sh.gen" ]; then
+		ansible-playbook $jupproc/ansible-jupyter/ansible_copy_reset.yml -i $jupproc/ansible-jupyter/inventory -e "DIR=  PBKDIR=$PBKDIR WORKSHOP=$w STDID=$stdid" --vault-password-file $jupproc/ansible-jupyter/vault_secret
+		if [ ! -x "$jupproc/scripts/reset-$w.sh.gen" ]; then
 			echo "Unable to reset backend for workshop $w, no script available"
 			exit -1
 		else
         		echo "Reseting workshop $w Backend"
-			$HOME/scripts/reset-$w.sh.gen
+			$jupproc/scripts/reset-$w.sh.gen
 		fi
 		erase_student
 
