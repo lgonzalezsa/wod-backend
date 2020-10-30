@@ -1,4 +1,5 @@
 MAILDIR=$HOME/.mail      # You'd better make sure it exists
+jupproc=$HOME/jupyter-procmail
 DEFAULT=$MAILDIR/mbox
 LOGFILE=$MAILDIR/from
 
@@ -6,16 +7,16 @@ LOGFILE=$MAILDIR/from
 #* ^From.*hpedev.hackshack@hpe.com.*
 # \/ defines what will be matched in $MATCH
 * ^Subject: *CREATE \/[1-9]+.*
-| $HOME/scripts/procmail-action.sh CREATE $MATCH
+| $jupproc/scripts/procmail-action.sh CREATE $MATCH
 
 :0b
 #* ^From.*hpedev.hackshack@hpe.com.*
 # \/ defines what will be matched in $MATCH
 * ^Subject: *CLEANUP \/[1-9]+.*
-| $HOME/scripts/procmail-action.sh CLEANUP $MATCH
+| $jupproc/scripts/procmail-action.sh CLEANUP $MATCH
 
 :0b
 #* ^From.*hpedev.hackshack@hpe.com.*
 # \/ defines what will be matched in $MATCH
 * ^Subject: *RESET \/[1-9]+.*
-| $HOME/scripts/procmail-action.sh RESET $MATCH
+| $jupproc/scripts/procmail-action.sh RESET $MATCH

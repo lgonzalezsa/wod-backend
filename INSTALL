@@ -20,11 +20,13 @@ copy ssh keys from another jupyterhub server
 setup sudo:
   jupyter ALL=(ALL) NOPASSWD:ALL
 copy .gitconfig & .git/config
+git clone git@github.com:HPEDevCom/jupyter-procmail.git
+cd jupyter-procmail
 launch scripts/install-jupyter.sh
 
 
 #### OLD ####
-Priorities: bash, powershell, ansible, rust, java, go
+Priorities: rust, java, go
 
     #Install conda for the whole system
     sudo ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
@@ -32,9 +34,6 @@ Priorities: bash, powershell, ansible, rust, java, go
     sudo /opt/conda/bin/conda create --prefix /opt/conda/envs/python python=3.7 ipykernel
     sudo /opt/conda/envs/python/bin/python -m ipykernel install --prefix=/opt/jupyterhub/ --name 'python' --display-name "Python (default)"
   
-	##install bash kernel adapted from https://pypi.org/project/bash_kernel/
-	sudo /opt/jupyterhub/bin/python3 -m bash_kernel.install
-	
 	### Install EvCxR Jupyter Kernel
 	##from  https://github.com/google/evcxr/tree/master/evcxr_jupyter
 	sudo vi ~/.bashrc
@@ -91,40 +90,5 @@ Priorities: bash, powershell, ansible, rust, java, go
 	sudo chmod +w ./kernel.json # in case copied kernel.json has no write permission
 	sudo sed "s|gophernotes|$(go env GOPATH)/bin/gophernotes|" < kernel.json.in > kernel.json
 	
-	
-	
-	## Install powershell for jupyter notebooks from https://github.com/vors/jupyter-powershell
-	# Notebook 
-	sudo /opt/jupyterhub/bin/python3 -m powershell_kernel.install
-	
-	# ubuntu 20.04
-  285  dotnet tool install -g powershell
-
-#ien symbolique en tant que root
-ln -sf ~jupyter/.dotnet/tools/pwsh /usr/local/bin
-
-
-	install  powershell modules :
-	pwsh
-	Install-Module -Name HPOneView.520 -RequiredVersion 5.20.2422.3962
-	Install-Module -Name HPEOneView.530 -RequiredVersion 5.30.2472.1534
-	Install-Module -Name HPEOneView.540 -RequiredVersion 5.40.2534.2926
-    
-
-    ## optionnal install iframe to launch url from jupyter
-    cd /opt/jupyterhub/bin/
-    sudo ./jupyter-labextension install jupyterlab_iframe
-    sudo ./jupyter-serverextension enable --py jupyterlab_iframe
-
-	
-	##ansible kernel from https://github.com/ansible/ansible-jupyter-kernel
-	sudo /opt/jupyterhub/bin/python3 -m ansible_kernel.install
-	
-###install kubectl
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
-sudo apt-get install -y kubectl
-
-
 mailserver name:  
 etc/postfix/main.cf
