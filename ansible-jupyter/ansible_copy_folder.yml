@@ -1,6 +1,6 @@
 # Playbook expects to have a Student0 folder in the directory where the playbook is run
 # # All variables in upper case come from the procmail-action.sh script
-- hosts: staging
+- hosts: all
   gather_facts: false
   #connection: local
   vars:

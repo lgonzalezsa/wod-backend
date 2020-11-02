@@ -1,13 +1,5 @@
-- hosts: test
+- hosts: all
   gather_facts: true
-  #connection:
-  vars:
-    usermin: 1001
-    usermax: 1250 
-    gidbase: 2000
-    uidbase: 2000
-    JPHUB: /opt/jupyterhub
-    CLEAN: false
 
   tasks: 
     - name: Ensure correct nproc soft limits

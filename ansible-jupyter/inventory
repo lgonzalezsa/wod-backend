@@ -2,6 +2,7 @@
 jupyterhub3.etc.fr.comm.hpecorp.net
 jupyterhub.etc.fr.comm.hpecorp.net
 jupyterhub2.hp.local
+jupyterhubtest.etc.fr.comm.hpecorp.net
 
 [staging]
 jupyterhub3.etc.fr.comm.hpecorp.net
@@ -17,4 +18,3 @@ jupyterhubtest.etc.fr.comm.hpecorp.net
 
 [localhost]
 127.0.0.1  ansible_connection=local
-

@@ -1,8 +1,8 @@
 # Playbook to generate instantiated reset scripts
 # # All variables in upper case come from the procmail-action.sh script
-- hosts: staging
+- hosts: all
   gather_facts: false
-  #connection: local
+
   tasks: 
     - fail:
         msg: STDID variable is empty ! Fat fingers ?!?

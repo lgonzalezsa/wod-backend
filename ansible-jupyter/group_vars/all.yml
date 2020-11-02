@@ -3,3 +3,9 @@ STDDIR: /student
 STD0DIR: "{{ ansible_env.HOME }}/student0"
 JUPPROC: "{{ ansible_env.HOME }}/jupyter-procmail"
 SCRIPTDIR: "{{ JUPPROC }}/scripts"
+JPHUB: /opt/jupyterhub
+CLEAN: false
+usermin: 1001
+usermax: 1250
+gidbase: 2000
+uidbase: 2000
