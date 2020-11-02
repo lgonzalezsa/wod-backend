@@ -81,6 +81,11 @@
         - "ulimit -u 641465"
         - "ulimit -n 65535"
 
+    - name: Ensure vim is the default EDITOR
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/.profile"
+        line: export EDITOR=vim
+
     - name: Setup logind.conf
       become: yes
       become_user: root
@@ -210,6 +215,7 @@
         - ldap-utils
         - nodejs
         - npm
+        - vim
         - pandoc
         - clang
         - cargo
