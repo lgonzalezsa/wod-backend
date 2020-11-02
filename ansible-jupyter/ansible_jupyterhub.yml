@@ -281,7 +281,7 @@
         group: jupyter
         mode: 0750
 
-    - name: install required pip packages
+    - name: Ensure all required pip packages are installed
       pip:
         name:
         - wheel 
@@ -294,6 +294,7 @@
         - ansible-kernel
         - bash_kernel
         - powershell_kernel
+        state: present
         virtualenv: "{{ JPHUB }}"
 
     - name: Ensure jupyter kernels are installed
@@ -395,13 +396,28 @@
         group: jupyter
         mode: 0750
 
-    - fail:
-        msg: Stopping for now
-        when: /bin/true
- 
-    - name: destroy existing student jupyter  users
-      command: "curl -X DELETE --silent -k -H 'Authorization: token {{ admintoken }}' {{ jupyterhubapi }}/hub/api/users/{{ 'student%s' | format(item) }}"
+        #    - name: Ensure that file vault_secret in {{ ansible_env.HOME }}//jupyter-procmail/ansible_jupyter/ exists 
+        #copy:
+        #dest: "{{ ansible_env.HOME }}/jupyter-procmail/ansible_jupyter/vault_secret"
+        #content:
+        #ceciestunmotdepassecompliquenomdenom!!!!!123      
+        #owner: jupyter
+        #group: jupyter
+        #mode: 0750
+
+   
+    # For this to work, you need to have a key used in deploy key of the projects
+    - name: Checkout notebooks from the jupyter-notebook git repo
+      git:
+        repo: git@github.com:HPEDevCom/jupyter-notebooks.git
+        dest: "{{ ansible_env.HOME }}/student0"
+
+    - name: Remove existing jupyter users
+      command: 
+        cmd: "curl -X DELETE --silent -k -H 'Authorization: token {{ admintoken }}' {{ jupyterhubapi }}/hub/api/users/{{ 'student%s' | format(item) }}"
+        warn: false
       loop: "{{ range( usermin, usermax + 1)|list }}"
+      when: CLEAN|bool
 
     - name: Remove Linux users and their home directory
       become: yes
@@ -437,19 +453,10 @@
         group: "{{ 'student%s' | format(item) }}"
       loop: "{{ range( usermin, usermax + 1)|list }}"
     
-    - name: check that student home directory /student/student%$' exists
-      become: yes
-      become_user: root
-      file:
-        path: "/student/{{ 'student%s' | format(item) }}"
-        state: directory
-        owner: "{{ 'student%s' | format(item) }}"
-        group: "{{ 'student%s' | format(item) }}"
-        mode: 0700
-      loop: "{{ range( usermin, usermax + 1)|list }}"
-    
-    - name: create  student jupyter  users
-      command: "curl -X POST --silent -k -H 'Authorization: token {{ admintoken }}' {{ jupyterhubapi }}/hub/api/users/{{ 'student%s' | format(item) }}"
+    - name: Ensure jupyter students users exist
+      command: 
+        cmd: "curl -X POST --silent -k -H 'Authorization: token {{ admintoken }}' {{ jupyterhubapi }}/hub/api/users/{{ 'student%s' | format(item) }}"
+        warn: false
       loop: "{{ range( usermin, usermax + 1)|list }}"
 
     - name: Setup ACL for students with jupyter account
@@ -475,31 +482,4 @@
         permissions: rwx
         default: yes
         state: present
-      loop: "{{ range( usermin, usermax + 1)|list }}"
-
-    - name: Setup ACL mask for students with jupyter account
-      become: yes
-      become_user: root
-      ansible.posix.acl:
-        path: "/student/{{ 'student%s' | format(item) }}"
-        recursive: yes
-        entity: jupyter
-        etype: mask
-        permissions: rwx
-        state: present
-        recalculate_mask: no_mask
-      loop: "{{ range( usermin, usermax + 1)|list }}"
-
-    - name: Setup default mask ACL for students with jupyter account
-      become: yes
-      become_user: root
-      ansible.posix.acl:
-        path: "/student/{{ 'student%s' | format(item) }}"
-        recursive: yes
-        entity: jupyter
-        etype: mask
-        permissions: rwx
-        default: yes
-        state: present
-        recalculate_mask: no_mask
       loop: "{{ range( usermin, usermax + 1)|list }}"
