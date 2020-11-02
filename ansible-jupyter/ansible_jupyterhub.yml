@@ -359,6 +359,13 @@
           c.JupyterHub.redirect_to_server = True
           #####################################################################################
 
+    - name: Copy jupyterhub service file 
+      become: yes
+      become_user: root
+      copy:
+        src: "{{ JUPPROC }}/jupyterhub.service"
+        dest: /etc/systemd/system/jupyterhub.service
+
     - name: Enable jupyterhub service 
       become: yes
       become_user: root
