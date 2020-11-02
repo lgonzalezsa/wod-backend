@@ -4,7 +4,7 @@
   gather_facts: false
   #connection: local
   vars:
-    playbk: "{{ jupproc }}/ansible-jupyter/{{ PBKDIR }}"
+    VARDIR: "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}"
 
   tasks: 
     - fail:
@@ -21,24 +21,24 @@
 
     - name: check variables file exists
       stat:
-        path: "{{ playbk }}/variables_{{ WORKSHOP }}.yml"
+        path: "{{ VARDIR }}/variables_{{ WORKSHOP }}.yml"
       register: variables_file
     - include_vars:
-        file: "{{ playbk }}/variables_{{ WORKSHOP }}.yml"
+        file: "{{ VARDIR }}/variables_{{ WORKSHOP }}.yml"
       when: variables_file.stat.exists
   
     - name: check password file exists
       stat:
-        path: "{{ playbk }}/variables_{{ WORKSHOP }}_pass.yml"
+        path: "{{ VARDIR }}/variables_{{ WORKSHOP }}_pass.yml"
       register: pass_file
     - include_vars:
-        file: "{{ playbk }}/variables_{{ WORKSHOP }}_pass.yml"
+        file: "{{ VARDIR }}/variables_{{ WORKSHOP }}_pass.yml"
       when: pass_file.stat.exists
   
     # find all notebooks
     - name: find jupyter notebooks
       find:
-        paths: "{{ ref }}/{{ DIR }}/{{ WORKSHOP }}"
+        paths: "{{ STD0DIR }}/{{ DIR }}/{{ WORKSHOP }}"
         recurse: yes
         # Add other file types to process them as ansible templates
         patterns: 
@@ -78,8 +78,8 @@
     # Synchronize target students with student0 Workshop content
     - name: synchronize master folder
       ansible.posix.synchronize:
-        src: "{{ ref }}/{{ DIR }}/{{ WORKSHOP }}/"
-        dest: "{{ prefix }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        src: "{{ STD0DIR }}/{{ DIR }}/{{ WORKSHOP }}/"
+        dest: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         rsync_opts: 
           - "--exclude=*.ipynb --exclude=*.py --exclude=Variables.ps1"
 
@@ -90,14 +90,14 @@
     - name: Deliver notebooks as ansible template for variable expansion
       template:
         src: "{{ item.path }}"
-        dest: "{{ item.path | regex_replace(ref, prefix + '/student' + STDID) }}"
+        dest: "{{ item.path | regex_replace(STD0DIR, STDDIR + '/student' + STDID) }}"
       with_items: "{{ notebooks.files }}"
 
     - name: Adapt owner/group/modes for target workshop
       become: yes
       become_user: root
       file:
-        path: '{{ prefix }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}'
+        path: '{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}'
         owner: student{{ STDID }}
         group: student{{ STDID }}
         recurse: yes
@@ -107,7 +107,7 @@
       become: yes
       become_user: root
       ansible.posix.acl:
-        path: "{{ prefix }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        path: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         recursive: yes
         entity: jupyter
         etype: user
@@ -118,7 +118,7 @@
       become: yes
       become_user: root
       ansible.posix.acl:
-        path: "{{ prefix }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
+        path: "{{ STDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}"
         recursive: yes
         entity: jupyter
         etype: user

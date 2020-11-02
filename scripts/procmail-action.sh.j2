@@ -54,7 +54,7 @@ changetype: modify
 replace: userPassword
 userPassword: $randompw
 EOF
-ldapmodify -D "cn=Directory Manager" -w {{ LDAPPWD }} -p {{ LDAPPORT }} -h {{ LDAPSRV.split(' ')[1] }} -x -f /tmp/ldif.$$ 
+	ldapmodify -D "cn=Directory Manager" -w CloudSystem$ -p 389 -h {{ LDAPSRV }} -x -f /tmp/ldif.$$ 
 	rm -f /tmp/ldif.$$
 }
 
@@ -98,8 +98,8 @@ erase_student() {
 #
 
 # endpoint variable - Has to be global
-APIENDPOINT=https://hackshackondemand.hpedev.io/api
-PBKDIR=test
+APIENDPOINT={{ APIENDPOINT }}
+PBKDIR={{ PBKDIR }}
 
 # Main of script
 action=$1
@@ -172,7 +172,7 @@ if [ $action != "RESET" ]; then
 
 		# Increment the student ID by Number of jupyter students in students table
     		# Only for API Calls 
-		dbstdid=$((stdid+0))
+		dbstdid=$((stdid+{{ BASESTDID }}))
 
 		# Instead do 2 API calls here, one for passwd change, one for status change
 		##Update Password
@@ -189,18 +189,18 @@ if [ $action != "RESET" ]; then
   				"$APIENDPOINT/customer/$userid"
 			##Start Student jupyterhub dedicated server
 			#curl --header "Content-Type: application/json" \
-			#	--header "Authorization: token 70844ab826f349ee80dbfbfa2bf5f92e" \
+			#	--header "Authorization: token {{ JPHUBTOKEN }}" \
                         #        --location \
                         #        --request POST \
 			#	--data-raw '{}' \
-                        #        "http://jupyterhubtest.etc.fr.comm.hpecorp.net:8000/hub/api/users/student$stdid/server"
+                        #        "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server"
 
 		elif [ "$action" = "CLEANUP" ]; then
 			#Delete Student jupyterhub dedicated server
-			curl --header "Authorization: token 70844ab826f349ee80dbfbfa2bf5f92e" \
+			curl --header "Authorization: token {{ JPHUBTOKEN }}" \
                                 --location \
 				--request DELETE \
-                                "http://jupyterhubtest.etc.fr.comm.hpecorp.net:8000/hub/api/users/student$stdid/server" 
+                                "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server" 
 			#Get Worshop reset status to determine if users should be updated to inactive or not
 			if [ _"`get_reset_status $id`" = _"false" ]; then
 				# Possible to clean dirs because no RESET so no file needed in that dir
@@ -243,8 +243,8 @@ elif [ "$action" = "RESET" ]; then
 		# API call TBD (active or assigned ?)
 		min=`echo $stdid | cut -d, -f1`
 		max=`echo $stdid | cut -d, -f2`
-		min=$((min+0))
-		max=$((max+0))
+		min=$((min+{{ BASESTDID }}))
+		max=$((max+{{ BASESTDID }}))
 		i=$max
 		cap=$((max-min+1))
 

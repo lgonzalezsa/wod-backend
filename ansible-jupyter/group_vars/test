@@ -1,5 +1,11 @@
-jupyterhubapi: http://jupyterhubtest.etc.fr.comm.hpecorp.net:8000
-admintoken: 70844ab826f349ee80dbfbfa2bf5f92e
+PBKDIR: test
+JPHOST: jupyterhubtest.etc.fr.comm.hpecorp.net
+JPIP: 16.31.85.203
+JPHOSTEXT: notebookstest.hpedev.io
+JPHUBAPISRV: http://{{ JPHOST }}:8000
+JPHUBTOKEN: 70844ab826f349ee80dbfbfa2bf5f92e
+BASESTDID: 0
+APIENDPOINT: https://hackshackondemand.hpedev.io/api
 #
 VCENTERAPP: "vcenter-hpedev.etc.fr.comm.hpecorp.net"
 VCENTERADMIN: "root"
@@ -14,3 +20,10 @@ HPEECPCTRL1: "16.31.84.41 controller.hpedevlab.net controller1.etc.fr.comm.hpeco
 HPEECPCTRL2: "16.31.84.38 controller2.hpedevlab.net controller2.etc.fr.comm.hpecorp.net"
 HPEECPGW1: "16.31.84.46 gateway1.hpedevlab.net gateway1.etc.fr.comm.hpecorp.net"
 HPEECPGW2: "16.31.84.37 gateway2.hpedevlab.net gateway2.etc.fr.comm.hpecorp.net"
+#LDAP Server
+LDAPSRV: "16.31.84.48 ldapsrv1.hpedevlab.net ldapsrv1.etc.fr.comm.hpecorp.net"
+LDAPPWD: "CloudSystem$"
+LDAPPORT: "389"
+
+# Postfix Port
+POSTPORT: "10026"

@@ -1,5 +1,5 @@
 ---
-prefix: /student
-ref: "{{ ansible_env.HOME }}/student0"
-jupproc: "{{ ansible_env.HOME }}/jupyter-procmail"
-scripts: "{{ jupproc }}/scripts"
+STDDIR: /student
+STD0DIR: "{{ ansible_env.HOME }}/student0"
+JUPPROC: "{{ ansible_env.HOME }}/jupyter-procmail"
+SCRIPTDIR: "{{ JUPPROC }}/scripts"

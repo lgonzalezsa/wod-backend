@@ -112,15 +112,14 @@
         mode: '0644'
         state: present
       with_items:
-        - "16.31.85.200 jupyterhub.etc.fr.comm.hpecorp.net jupyterhub notebooks.hpedev.io notebooks"
-        - "16.31.85.201 jupyterhub3.etc.fr.comm.hpecorp.net jupyterhub3 notebooks3.hpedev.io notebooks3"
-        - "192.168.10.127 jupyterhub2.hp.local jupyterhub2 notebooks2.hpedev.io notebooks2"
+        - "{{ JPIP }} {{ JPHOST }} {{ JPHOST.split('.')[0] }}  {{ JPHOSTEXT }} {{ JPHOSTEXT.split('.')[0] }}"
         - "{{ REDFISHILO }}"
         - "{{ REDFISHOBMC }}"
         - "{{ HPEECPCTRL1 }}"
         - "{{ HPEECPCTRL2 }}"
         - "{{ HPEECPGW1 }}"
         - "{{ HPEECPGW2 }}"
+        - "{{ LDAPSRV }}"
 
     - name: Ensure that required packages are installed for repo setup
       become: yes
@@ -326,7 +325,7 @@
         state: link
     
     - name: Ensure powershell scripts are installed
-      command: "{{ ansible_env.HOME }}/jupyter-procmail/scripts/install_PwshModules.sh"
+      command: "{{ SCRIPTDIR }}/install_PwshModules.sh"
     
     - name: Ensure that directory "{{ JPHUB }}/etc/jupyterhub" exists
       file:
@@ -368,6 +367,45 @@
         enabled: yes
         name: jupyterhub
 
+    - name: Ensure listening port in postfix master.cf is configured correctly
+      become: yes
+      become_user: root
+      lineinfile:
+        path: /etc/postfix/master.cf
+        regex: '^smtp\s*inet'
+        line: '{{ POSTPORT }}      inet  n       -       y       -       -       smtpd'
+        state: present
+
+    - name: Ensure myhostname in postfix main.cf is configured correctly
+      become: yes
+      become_user: root
+      lineinfile:
+        path: /etc/postfix/main.cf
+        regex: '^myhostname ='
+        line: "myhostname = $myhostname, {{ JPHOST }}, {{ JPHOST.split('.')[0] }}, {{ JPHOSTEXT }}, {{ JPHOSTEXT.split('.')[0] }}, localhost, localhost.localdomain"
+        state: present
+
+    - name: Deploy an instanciated procmailrc conf file
+      template:
+        src: "{{ JUPPROC }}/procmailrc.j2"
+        dest: "{{ ansible_env.HOME }}/.procmailrc"
+        mode: 0600
+
+    - name: Deploy an instanciated procmail-actions script
+      template:
+        src: "{{ SCRIPTDIR }}/procmail-action.sh.j2"
+        dest: "{{ SCRIPTDIR }}/procmail-action.sh"
+        mode: 0700
+
+    - name: Enable postfix service 
+      become: yes
+      become_user: root
+      systemd:
+        state: started
+        daemon_reload: yes
+        enabled: yes
+        name: postfix
+
     - name: Ensure that directory /student exists
       become: yes
       become_user: root
@@ -396,9 +434,9 @@
         group: jupyter
         mode: 0750
 
-        #    - name: Ensure that file vault_secret in {{ ansible_env.HOME }}//jupyter-procmail/ansible_jupyter/ exists 
+        #    - name: Ensure that file vault_secret in {{ JUPPROC }}/ansible_jupyter/ exists 
         #copy:
-        #dest: "{{ ansible_env.HOME }}/jupyter-procmail/ansible_jupyter/vault_secret"
+        #dest: "{{ JUPPROC }}/ansible_jupyter/vault_secret"
         #content:
         #ceciestunmotdepassecompliquenomdenom!!!!!123      
         #owner: jupyter
@@ -414,7 +452,7 @@
 
     - name: Remove existing jupyter users
       command: 
-        cmd: "curl -X DELETE --silent -k -H 'Authorization: token {{ admintoken }}' {{ jupyterhubapi }}/hub/api/users/{{ 'student%s' | format(item) }}"
+        cmd: "curl -X DELETE --silent -k -H 'Authorization: token {{ JPHUBTOKEN }}' {{ JPHUBAPISRV }}/hub/api/users/{{ 'student%s' | format(item) }}"
         warn: false
       loop: "{{ range( usermin, usermax + 1)|list }}"
       when: CLEAN|bool
@@ -455,7 +493,7 @@
     
     - name: Ensure jupyter students users exist
       command: 
-        cmd: "curl -X POST --silent -k -H 'Authorization: token {{ admintoken }}' {{ jupyterhubapi }}/hub/api/users/{{ 'student%s' | format(item) }}"
+        cmd: "curl -X POST --silent -k -H 'Authorization: token {{ JPHUBTOKEN }}' {{ JPHUBAPISRV }}/hub/api/users/{{ 'student%s' | format(item) }}"
         warn: false
       loop: "{{ range( usermin, usermax + 1)|list }}"
 

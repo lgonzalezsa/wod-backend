@@ -21,4 +21,4 @@
         src: "{{ item }}"
         dest: "{{ item }}.gen"
         mode: 0755
-      with_fileglob: [ '{{ scripts }}/reset-*.sh' ]
+      with_fileglob: [ '{{ SCRIPTDIR }}/reset-*.sh' ]
