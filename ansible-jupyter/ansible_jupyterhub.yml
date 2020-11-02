@@ -171,23 +171,18 @@
         repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
         state: present
 
+    - name: Setup MicroSoft repo
+      become: yes
+      become_user: root
+      apt:
+        deb: https://packages.microsoft.com/config/ubuntu/{{ ansible_distribution_version }}/packages-microsoft-prod.deb
+
     - name: Update apt cache
       become: yes
       become_user: root
       apt:
         update_cache: yes
       changed_when: False
-
-        #    - name: download additional packages are installed
-        #get_url:
-        #url: https://packages.microsoft.com/config/ubuntu/{{ ansible_distribution_version }}/packages-microsoft-prod.deb
-        #dest: /tmp/packages-microsoft-prod.deb
-
-    - name: Setup MicroSoft repo
-      become: yes
-      become_user: root
-      apt:
-        deb: https://packages.microsoft.com/config/ubuntu/{{ ansible_distribution_version }}/packages-microsoft-prod.deb
 
     - name: Ensure all required packages are installed
       become: yes
