@@ -1,6 +1,10 @@
 #!/usr/local/bin/pwsh
 #
 # This script will install all required Powershell modules for the jupyter notebooks run
+#
+Set-PSRepository -Name PSGallery -InstallationPolicy Trusted
+Set-PowerCLIConfiguration -Scope User -ParticipateInCEIP $false -Confirm:$false
+Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -DisplayDeprecationWarnings $false -Scope AllUsers -Confirm:$false
 
 Install-Module -Name VMware.PowerCLI
 Install-Module -Name HPOneView.520 -RequiredVersion 5.20.2422.3962
