@@ -76,6 +76,18 @@
         - "ulimit -u 641465"
         - "ulimit -n 65535"
 
+    - name: Test .profile file
+      command: ls "{{ ansible_env.HOME }}/.profile"
+      register: profile_path
+      ignore_errors: true
+      changed_when: false
+    
+    - name: Ensure we have a .profie file
+      copy:
+        src: /etc/skel/.profile
+        dest: "{{ ansible_env.HOME }}/.profile"
+      when: profile_path.rc != 0
+  
     - name: Ensure vim is the default EDITOR
       lineinfile:
         path: "{{ ansible_env.HOME }}/.profile"
