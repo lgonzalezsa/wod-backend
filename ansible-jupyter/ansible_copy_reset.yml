@@ -1,7 +1,7 @@
 # Playbook to generate instantiated reset scripts
 # # All variables in upper case come from the procmail-action.sh script
 - hosts: all
-  gather_facts: false
+  gather_facts: true
 
   tasks: 
     - fail:

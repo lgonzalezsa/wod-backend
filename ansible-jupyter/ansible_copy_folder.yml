@@ -1,8 +1,7 @@
 # Playbook expects to have a Student0 folder in the directory where the playbook is run
 # # All variables in upper case come from the procmail-action.sh script
 - hosts: all
-  gather_facts: false
-  #connection: local
+  gather_facts: true
   vars:
     VARDIR: "{{ JUPPROC }}/ansible-jupyter/{{ PBKDIR }}"
 
@@ -22,7 +21,9 @@
     - name: check variables file exists
       stat:
         path: "{{ VARDIR }}/variables_{{ WORKSHOP }}.yml"
+      ignore_errors: true
       register: variables_file
+
     - include_vars:
         file: "{{ VARDIR }}/variables_{{ WORKSHOP }}.yml"
       when: variables_file.stat.exists
@@ -30,7 +31,9 @@
     - name: check password file exists
       stat:
         path: "{{ VARDIR }}/variables_{{ WORKSHOP }}_pass.yml"
+      ignore_errors: true
       register: pass_file
+
     - include_vars:
         file: "{{ VARDIR }}/variables_{{ WORKSHOP }}_pass.yml"
       when: pass_file.stat.exists
