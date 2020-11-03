@@ -349,7 +349,7 @@
         state: directory
         owner: jupyter
         group: jupyter
-        mode: 0750
+        mode: 0751
 
     - name: Remove jupyterhub configuration file
       file:
@@ -472,14 +472,14 @@
         group: jupyter
         mode: 0750
 
-        #    - name: Ensure that file vault_secret in {{ JUPPROC }}/ansible_jupyter/ exists 
-        #copy:
-        #dest: "{{ JUPPROC }}/ansible_jupyter/vault_secret"
-        #content:
-        #ceciestunmotdepassecompliquenomdenom!!!!!123      
-        #owner: jupyter
-        #group: jupyter
-        #mode: 0750
+    - name: Ensure that file vault_secret in {{ JUPPROC }}/ansible_jupyter/ exists 
+        copy:
+        dest: "{{ JUPPROC }}/ansible_jupyter/vault_secret"
+        content:
+        "{{ VAULTPWD }}"
+        owner: jupyter
+        group: jupyter
+        mode: 0750
 
    
     # For this to work, you need to have a key used in deploy key of the projects
