@@ -473,22 +473,32 @@
         group: jupyter
         mode: 0750
 
-    - name: Ensure that file vault_secret in {{ JUPPROC }}/ansible_jupyter/ exists 
-        copy:
-        dest: "{{ JUPPROC }}/ansible_jupyter/vault_secret"
-        content:
-        "{{ VAULTPWD }}"
-        owner: jupyter
-        group: jupyter
-        mode: 0750
-
+    - name: Ensure that file vault_secret in {{ JUPPROC }}/ansible-jupyter/ exists 
+      shell: echo '{{ VAULTPWD }}' > "{{ JUPPROC }}/ansible-jupyter/vault_secret"
    
+    - name: Fix modes for {{ JUPPROC }}/ansible-jupyter/vault_secret
+      file: 
+        path: "{{ JUPPROC }}/ansible-jupyter/vault_secret"
+        mode: 0700
+
     # For this to work, you need to have a key used in deploy key of the projects
     - name: Checkout notebooks from the jupyter-notebook git repo
       git:
         repo: git@github.com:HPEDevCom/jupyter-notebooks.git
         dest: "{{ ansible_env.HOME }}/student0"
         key_file: "{{ ansible_env.HOME }}/.ssh/id_student0"
+
+    - name: Fix git config for future commit on student0
+      lineinfile:
+        path: "{{ ansible_env.HOME }}/student0/.git/config"
+        line: "sshCommand = ssh -i ~/.ssh/id_student0 -F /dev/null"
+        insertafter: '^\s+logallrefupdates'
+
+    - name: Fix git config for future commit on juŷter-procmail
+      lineinfile:
+        path: "{{ JUPPROC }}/.git/config"
+        line: "sshCommand = ssh -i ~/.ssh/id_jupproc -F /dev/null"
+        insertafter: '^\s+logallrefupdates'
 
     - name: Remove existing jupyter users
       command: 
