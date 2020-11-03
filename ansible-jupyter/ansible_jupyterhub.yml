@@ -277,6 +277,7 @@
         state: absent
         virtualenv: "{{ JPHUB }}"
       when: CLEAN|bool
+      ignore_errors: true
 
     - name: Remove directory "{{ JPHUB }}"
       become: yes
@@ -294,7 +295,7 @@
         state: directory
         owner: jupyter
         group: jupyter
-        mode: 0750
+        mode: 0751
 
     - name: Ensure all required pip packages are installed
       pip:
