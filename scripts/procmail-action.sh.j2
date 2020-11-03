@@ -127,10 +127,10 @@ fi
 shift
 
 # We need to ensure that we've got a correct id as parameter if needed
-MIN=1
-MAX=1000
+MIN={{ USERMIN }}
+MAX={{ USERMAX }}
 
-if [ $stdid -le $MIN ] ||  [ $stdid -ge $MAX ]; then
+if [ $stdid -lt $MIN ] ||  [ $stdid -gt $MAX ]; then
 	echo "Student id ($stdid) should be between $MIN and $MAX"
 	exit -1
 fi

@@ -472,7 +472,7 @@
       command: 
         cmd: "curl -X DELETE --silent -k -H 'Authorization: token {{ JPHUBTOKEN }}' {{ JPHUBAPISRV }}/hub/api/users/{{ 'student%s' | format(item) }}"
         warn: false
-      loop: "{{ range( usermin, usermax + 1)|list }}"
+      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
       when: CLEAN|bool
 
     - name: Remove Linux users and their home directory
@@ -483,7 +483,7 @@
         state: absent
         remove: yes  
         force: yes
-      loop: "{{ range( usermin, usermax + 1)|list }}"
+      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
       when: CLEAN|bool
 
     - name: Ensure dedicated students groups exist
@@ -492,8 +492,8 @@
       group:
         name: "{{ 'student%s' | format(item) }}"
         state: present
-        gid: "{{ item + gidbase }}"
-      loop: "{{ range( usermin, usermax + 1)|list }}"
+        gid: "{{ item + GIDBASE }}"
+      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
 
     - name: Ensure Linux students users exists with their home dir
       become: yes
@@ -505,15 +505,15 @@
         home: "/student/{{ 'student%s' | format(item) }}"
         comment: "{{ 'student%s' | format(item) }}"
         shell: /bin/bash
-        uid: "{{ item + uidbase }}"
+        uid: "{{ item + UIDBASE }}"
         group: "{{ 'student%s' | format(item) }}"
-      loop: "{{ range( usermin, usermax + 1)|list }}"
+      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
     
     - name: Ensure jupyter students users exist
       command: 
         cmd: "curl -X POST --silent -k -H 'Authorization: token {{ JPHUBTOKEN }}' {{ JPHUBAPISRV }}/hub/api/users/{{ 'student%s' | format(item) }}"
         warn: false
-      loop: "{{ range( usermin, usermax + 1)|list }}"
+      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
 
     - name: Setup ACL for students with jupyter account
       become: yes
@@ -525,7 +525,7 @@
         etype: user
         permissions: rwx
         state: present
-      loop: "{{ range( usermin, usermax + 1)|list }}"
+      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
 
     - name: Setup default ACL for students with jupyter account
       become: yes
@@ -538,4 +538,4 @@
         permissions: rwx
         default: yes
         state: present
-      loop: "{{ range( usermin, usermax + 1)|list }}"
+      loop: "{{ range( USERMIN, USERMAX + 1)|list }}"
