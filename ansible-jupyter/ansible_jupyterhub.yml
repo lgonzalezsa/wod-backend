@@ -183,6 +183,14 @@
         repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
         state: present
 
+    - name: Remove MicroSoft repo package
+      become: yes
+      become_user: root
+      apt:
+        pkg: 
+        - packages-microsoft-prod.deb
+        state: absent
+
     - name: Setup MicroSoft repo
       become: yes
       become_user: root
