@@ -13,16 +13,21 @@
 	ssh server ok
 
 Autoinstall with ansible and sshd
-
 setup jupyter account
 setup ssh
 copy ssh keys from another jupyterhub server
+add id_rsa.pub in authorized_keys
+ssh localhost ls
 setup sudo:
   jupyter ALL=(ALL) NOPASSWD:ALL
 copy .gitconfig & .git/config
+export EDITOR=vim
+
 git clone git@github.com:HPEDevCom/jupyter-procmail.git
+or 
+GIT_SSH_COMMAND='ssh -i ~/.ssh/id_mougins -v ' git clone git@github.com:HPEDevCom/jupyter-procmail.git
 cd jupyter-procmail
-launch scripts/install-jupyter.sh
+launch scripts/install_jupyter.sh
 
 
 #### OLD ####
@@ -89,6 +94,3 @@ Priorities: rust, java, go
  	sudo cp "$(go env GOPATH)"/pkg/mod/github.com/gopherdata/gophernotes@v0.7.1/kernel/*  "."
 	sudo chmod +w ./kernel.json # in case copied kernel.json has no write permission
 	sudo sed "s|gophernotes|$(go env GOPATH)/bin/gophernotes|" < kernel.json.in > kernel.json
-	
-mailserver name:  
-etc/postfix/main.cf
