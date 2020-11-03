@@ -21,13 +21,10 @@ ssh localhost ls
 setup sudo:
   jupyter ALL=(ALL) NOPASSWD:ALL
 copy .gitconfig & .git/config
-export EDITOR=vim
 
-git clone git@github.com:HPEDevCom/jupyter-procmail.git
-or 
-GIT_SSH_COMMAND='ssh -i ~/.ssh/id_mougins -v ' git clone git@github.com:HPEDevCom/jupyter-procmail.git
+GIT_SSH_COMMAND='ssh -i ~/.ssh/id_jupproc -v ' git clone git@github.com:HPEDevCom/jupyter-procmail.git
 cd jupyter-procmail
-launch scripts/install_jupyter.sh
+./scripts/install_jupyter.sh
 
 
 #### OLD ####

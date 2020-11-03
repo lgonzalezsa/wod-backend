@@ -488,6 +488,7 @@
       git:
         repo: git@github.com:HPEDevCom/jupyter-notebooks.git
         dest: "{{ ansible_env.HOME }}/student0"
+        key_file: "{{ ansible_env.HOME }}/.ssh/id_student0"
 
     - name: Remove existing jupyter users
       command: 
