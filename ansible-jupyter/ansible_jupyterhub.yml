@@ -60,10 +60,13 @@
         rule: allow
         port: "{{ item }}"
         proto: tcp
+        state: enabled
       with_items:
         - "8000"
         - "443"
         - "80"
+        - "22"
+        - "{{POSTPORT}}"
 
     - name: Ensure limits are correct for jupyter account
       lineinfile:
@@ -358,7 +361,7 @@
         src: "{{ JUPPROC }}/jupyterhub.service"
         dest: /etc/systemd/system/jupyterhub.service
 
-    - name: Enable jupyterhub service 
+    - name: Enable Jupyterhub service 
       become: yes
       become_user: root
       systemd:
@@ -382,7 +385,16 @@
       lineinfile:
         path: /etc/postfix/main.cf
         regex: '^myhostname ='
-        line: "myhostname = $myhostname, {{ JPHOST }}, {{ JPHOST.split('.')[0] }}, {{ JPHOSTEXT }}, {{ JPHOSTEXT.split('.')[0] }}, localhost, localhost.localdomain"
+        line: "myhostname = {{ JPHOST }}"
+        state: present
+
+    - name: Ensure mydestination in postfix main.cf is configured correctly
+      become: yes
+      become_user: root
+      lineinfile:
+        path: /etc/postfix/main.cf
+        regex: '^mydestination ='
+        line: "mydestination = $myhostname, {{ JPHOST.split('.')[0] }}, {{ JPHOSTEXT }}, {{ JPHOSTEXT.split('.')[0] }}, localhost, localhost.localdomain"
         state: present
 
     - name: Deploy an instanciated procmailrc conf file
@@ -391,10 +403,16 @@
         dest: "{{ ansible_env.HOME }}/.procmailrc"
         mode: 0600
 
-    - name: Deploy an instanciated procmail-actions script
+    - name: Deploy an instanciated procmail-action script
       template:
         src: "{{ SCRIPTDIR }}/procmail-action.sh.j2"
         dest: "{{ SCRIPTDIR }}/procmail-action.sh"
+        mode: 0700
+
+    - name: Deploy an instanciated test-action script
+      template:
+        src: "{{ SCRIPTDIR }}/test-action.sh.j2"
+        dest: "{{ SCRIPTDIR }}/test-action.sh"
         mode: 0700
 
     - name: Enable postfix service 
