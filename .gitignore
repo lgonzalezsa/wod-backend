@@ -1,2 +1,3 @@
 scripts/procmail-action.sh
 scripts/test-action.sh
+jupyterhub.sqlite

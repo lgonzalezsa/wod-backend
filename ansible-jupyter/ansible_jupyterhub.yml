@@ -313,7 +313,7 @@
         virtualenv: "{{ JPHUB }}"
 
     - name: Ensure jupyter kernels are installed
-      shell: . '{{ JPHUB }}/bin/activate' && python3 -m "{{ item }}.install"
+      shell: . '{{ JPHUB }}/bin/activate' && python3 -m "{{ item }}.install" --prefix={{ JPHUB }}
       with_items:
         - bash_kernel
         - powershell_kernel
