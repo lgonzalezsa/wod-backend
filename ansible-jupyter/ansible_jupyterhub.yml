@@ -479,7 +479,7 @@
     - name: Fix modes for {{ JUPPROC }}/ansible-jupyter/vault_secret
       file: 
         path: "{{ JUPPROC }}/ansible-jupyter/vault_secret"
-        mode: 0700
+        mode: 0600
 
     # For this to work, you need to have a key used in deploy key of the projects
     - name: Checkout notebooks from the jupyter-notebook git repo
