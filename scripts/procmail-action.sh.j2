@@ -230,12 +230,12 @@ elif [ "$action" = "RESET" ]; then
 		# Then call the reset script
 		# Get Workshop backend reset status
 		ansible-playbook $JUPPROC/ansible-jupyter/ansible_copy_reset.yml -i $JUPPROC/ansible-jupyter/inventory --limit {{ PBKDIR }} -e "DIR=  WORKSHOP=$w STDID=$stdid" --vault-password-file $JUPPROC/ansible-jupyter/vault_secret
-		if [ ! -x "$JUPPROC/scripts/reset-$w.sh.gen" ]; then
+		if [ ! -x "$JUPPROC/scripts/reset-$w.sh" ]; then
 			echo "Unable to reset backend for workshop $w, no script available"
 			exit -1
 		else
         		echo "Reseting workshop $w Backend"
-			$JUPPROC/scripts/reset-$w.sh.gen
+			$JUPPROC/scripts/reset-$w.sh
 		fi
 
 		# API call TBD (active or assigned ?)
