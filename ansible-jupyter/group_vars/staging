@@ -10,7 +10,6 @@ APIENDPOINT: https://hackshackondemand.hpedev.io/api
 VCENTERAPP: "vcenter-hpedev.etc.fr.comm.hpecorp.net"
 VCENTERADMIN: "root"
 VCENTERPWD: "vmware"
-OVVMSIMU1: "STA-HPEOneView-DCS_5.20.00-0419927"
 #
 # Used by Francois for Redfish notebooks
 REDFISHILO: "16.31.87.207 ilo5"
@@ -29,6 +28,8 @@ LDAPPORT: "389"
 POSTPORT: "10026"
 
 #Oneview API Endpoints
+OVVMSIMU1: "STA1-HPEOneView-DCS_5.20.00-0419927"
 OVVMSIMU1IP: "16.31.86.248"
+OVVMSIMU2: "STA2-HPEOneView-DCS_5.20.00-0419867"
 OVVMSIMU2IP: "16.31.86.250"
 
