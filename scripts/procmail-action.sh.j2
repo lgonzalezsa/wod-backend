@@ -82,11 +82,10 @@ get_workshop_name() {
 erase_student() {
 
 	if [ _"$stddir" != _"" ]; then
+		echo "Resetting ACLs masks for student dir $stddir"
+		sudo setfacl -R -m m::rwx $stddir
 		echo "Erasing target student dir $stddir content"
-		rm -rf $stddir/*
-		# For now we need to be root to suppress these dirs
-		sudo rm -rf $stddir/.local $stddir/.config $stddir/.ipython
-		find $stddir -name '.??*' -print0 | xargs -0 rm -rf
+		rm -rf $stddir/* $stddir/.??*
 		cp -a /etc/skel/.??* $stddir
 		sudo chown student${stdid}:student${stdid} $stddir/.??*
 	fi
