@@ -214,6 +214,28 @@
         enabled: yes
         name: postfix
 
+    - name: Install the pkg update script
+      become: yes
+      become_user: root
+      copy:
+        src: {{ SCRIPTDIR }}/upd
+        dest: /usr/local/bin/upd
+        owner: root
+        group: root
+        mode: 0700
+
+    - name: Setup crontab for daily pkg security update
+      become: yes
+      become_user: root
+      cron:
+        name: upd
+        minute: "{{ 60 | random }} "
+        hour: 03
+        user: root
+        job: "/usr/local/bin/upd"
+        cron_file: upd
+        state: present
+
     - name: Ensure that directory /student exists
       become: yes
       become_user: root

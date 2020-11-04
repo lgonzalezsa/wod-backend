@@ -239,12 +239,21 @@ elif [ "$action" = "RESET" ]; then
 		fi
 
 		# API call TBD (active or assigned ?)
-		min=`echo $stdid | cut -d, -f1`
-		max=`echo $stdid | cut -d, -f2`
-		min=$((min+{{ BASESTDID }}))
-		max=$((max+{{ BASESTDID }}))
-		i=$max
-		cap=$((max-min+1))
+		echo $stdid  | grep -q ',' 
+		if [ $? -eq 0 ]; then
+			# We have a range to manage
+			min=`echo $stdid | cut -d, -f1`
+			max=`echo $stdid | cut -d, -f2`
+			min=$((min+{{ BASESTDID }}))
+			max=$((max+{{ BASESTDID }}))
+			i=$max
+			cap=$((max-min+1))
+		else
+			# We have a single value to manage
+			i=$stdid
+			min=$stdid
+			cap=1
+		fi
 
 		while [ $i -ge $min ]; do
 			# API call
@@ -268,5 +277,4 @@ elif [ "$action" = "RESET" ]; then
 else
 	echo "Unknown action $action"
 fi
-echo "end of procmail-action at `date` "
-
+echo "end of procmail-action for student $stdid" with workshop $w with action $action at `date` "
