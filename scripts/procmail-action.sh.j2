@@ -85,7 +85,7 @@ erase_student() {
 		echo "Erasing target student dir $stddir content"
 		rm -rf $stddir/*
 		# For now we need to be root to suppress these dirs
-		sudo rm -rf $stddir/.local $stddir/.config
+		sudo rm -rf $stddir/.local $stddir/.config $stddir/.ipython
 		find $stddir -name '.??*' -print0 | xargs -0 rm -rf
 		cp -a /etc/skel/.??* $stddir
 		sudo chown student${stdid}:student${stdid} $stddir/.??*
@@ -203,13 +203,13 @@ if [ $action != "RESET" ]; then
                                 "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server" 
 			#Get Worshop reset status to determine if users should be updated to inactive or not
 			if [ _"`get_reset_status $id`" = _"false" ]; then
-				# Possible to clean dirs because no RESET so no file needed in that dir
-				erase_student
 				##Update customer status to inactive
 				curl --header "Content-Type: application/json" \
   					--request PUT \
   					--data '{"assigned":"false"}' \
   					"$APIENDPOINT/student/$dbstdid"
+				# Possible to clean dirs because no RESET so no file needed in that dir
+				erase_student
 			else
 				curl --header "Content-Type: application/json" \
   					--request PUT \
@@ -238,7 +238,6 @@ elif [ "$action" = "RESET" ]; then
         		echo "Reseting workshop $w Backend"
 			$JUPPROC/scripts/reset-$w.sh.gen
 		fi
-		erase_student
 
 		# API call TBD (active or assigned ?)
 		min=`echo $stdid | cut -d, -f1`
@@ -263,6 +262,8 @@ elif [ "$action" = "RESET" ]; then
   			--request PUT \
   			--data '{"capacity":"'$cap'"}' \
   			"$APIENDPOINT/workshop/$id"
+
+		erase_student
 	fi
 
 else
