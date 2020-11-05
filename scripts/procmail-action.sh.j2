@@ -162,8 +162,7 @@ if [ $action != "RESET" ]; then
 	# Read workshop list on stdin
 	if [ -d "$stddir" ]; then
 		# Now change passwd
-		randompw=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
-		echo "student$stdid:$randompw" | sudo chpasswd
+		generate_randompwd
 
 		# Some Notebooks need an LDAP passwd update as well
 		if [ _"`get_ldap_status $id`" != _"false" ]; then
@@ -236,6 +235,14 @@ if [ $action != "RESET" ]; then
 elif [ "$action" = "RESET" ]; then
 	if [ _"`get_reset_status $id`" = _"true" ]; then
 		# Then call the reset script
+		# Now change passwd as sometimes the reset script needs to have it
+		generate_randompwd
+
+		# Some Notebooks need an LDAP passwd update as well
+		if [ _"`get_ldap_status $id`" != _"false" ]; then
+			update_ldap_passwd
+		fi
+
 		# Get Workshop backend reset status
 		if [ ! -x "$JUPPROC/scripts/reset-$w.sh" ]; then
 			echo "Unable to reset backend for workshop $w, no script available"
