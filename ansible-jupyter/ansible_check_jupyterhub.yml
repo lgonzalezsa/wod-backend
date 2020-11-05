@@ -218,7 +218,7 @@
       become: yes
       become_user: root
       copy:
-        src: {{ SCRIPTDIR }}/upd
+        src: "{{ SCRIPTDIR }}/upd"
         dest: /usr/local/bin/upd
         owner: root
         group: root

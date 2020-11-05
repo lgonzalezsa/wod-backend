@@ -90,6 +90,14 @@ erase_student() {
 		sudo chown student${stdid}:student${stdid} $stddir/.??*
 	fi
 }
+
+#this function creates a random password for a user, it is used for local and ldap users'passwords.
+generate_randompwd() {
+
+       export randompw=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
+       echo "student$stdid:$randompw" | sudo chpasswd
+}
+
 #
 # Main part
 #
@@ -237,8 +245,7 @@ elif [ "$action" = "RESET" ]; then
 			$JUPPROC/scripts/reset-$w.sh
 		fi
 
-		# API call TBD (active or assigned ?)
-		echo $stdid  | grep -q ',' 
+		echo $stdid | grep -q ','
 		if [ $? -eq 0 ]; then
 			# We have a range to manage
 			min=`echo $stdid | cut -d, -f1`
@@ -249,14 +256,15 @@ elif [ "$action" = "RESET" ]; then
 			cap=$((max-min+1))
 		else
 			# We have a single value to manage
-			i=$stdid
-			min=$stdid
+			i=$((stdid+{{ BASESTDID }}))
+			min=$((stdid+{{ BASESTDID }}))
 			cap=1
 		fi
 
 		while [ $i -ge $min ]; do
 			# API call
 			##Update customer status to inactive
+			# API call TBD (active or assigned ?)
 			curl --header "Content-Type: application/json" \
   				--request PUT \
   				--data '{"assigned":"false"}' \
