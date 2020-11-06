@@ -8,6 +8,8 @@
       apt:
         pkg:
         - apt-transport-https
+        - curl
+        - gnupg2
 
     - name: Update apt cache
       become: yes
@@ -188,6 +190,19 @@
         - rust-magic
         state: present
         virtualenv: "{{ JPHUB }}"
+
+    - name: Ensure Go kernel is installed
+      shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=on go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
+
+    - name: Make gophernotes available under /usr/local/bin with a symlink
+      become: yes
+      become_user: root
+      file:
+        src: "{{ ansible_env.HOME }}/go/bin/gophernotes"
+        dest: /usr/local/bin/gophernotes
+        owner: jupyter
+        group: jupyter
+        state: link
 
     - name: Ensure jupyter kernels are installed
       shell: . '{{ JPHUB }}/bin/activate' && python3 -m "{{ item }}.install" --prefix={{ JPHUB }}

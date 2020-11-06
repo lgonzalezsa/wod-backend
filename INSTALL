@@ -36,18 +36,6 @@ Priorities: rust, java, go
     sudo /opt/conda/bin/conda create --prefix /opt/conda/envs/python python=3.7 ipykernel
     sudo /opt/conda/envs/python/bin/python -m ipykernel install --prefix=/opt/jupyterhub/ --name 'python' --display-name "Python (default)"
   
-	### Install EvCxR Jupyter Kernel
-	##from  https://github.com/google/evcxr/tree/master/evcxr_jupyter
-	sudo vi ~/.bashrc
-	# Rust Kernel req for jupyter
-	export PATH=$PATH:/home/jupyter/.cargo/bin
-	##install kernel
-	cargo install evcxr_jupyter
-	/home/jupyter/.cargo/bin/evcxr_jupyter --install
-	evcxr_jupyter --install
-	##System wide:
-	sudo mv .local/share/jupyter/kernels/rust /opt/jupyterhub/share/jupyter/kernels/
-
 	### Install Java Kernel
 	#install from https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-on-ubuntu-18-04-fr
 	#Definition Java$Home
@@ -64,30 +52,3 @@ Priorities: rust, java, go
 	#Result is: 
 	Installed java kernel into "/usr/local/share/jupyter/kernels/java"
 
-
-	### Install Go Kernel
-	# Install go first https://linuxize.com/post/how-to-install-go-on-ubuntu-18-04/
-	#dowload go :
-	# BCO: do we need 1.15 vs std 1.10 ?
-	wget https://golang.org/dl/go1.15.2.linux-amd64.tar.gz
-	#extract to /usr/local directory:
-	sudo tar -C /usr/local -xzf go1.13.linux-amd64.tar.gz
-	#Adjusting the Path Variable
-	#In order for the system to know where to find the Go executable binaries, we need to adjust the $PATH environment variable. We can do this by appending the following line to the /etc/profile file (for a system-wide installation) or the $HOME/.profile file (for a current user installation):
-	#edit  ~/.profile
-	vi ~/.profile
-	#add the following lines at the end
-	export PATH=$PATH:/usr/local/go/bin
-	#save teh file wq!
-	source ~/.profile
-	#Verifying the Go Installation 
-	go version
-	
-	#Install go kernel
-	env GO111MODULE=on go get github.com/gopherdata/gophernotes
-	cd 
-	sudo mkdir -p /usr/local/share/jupyter/kernels/gophernotes
-	cd /usr/local/share/jupyter/kernels/gophernotes
- 	sudo cp "$(go env GOPATH)"/pkg/mod/github.com/gopherdata/gophernotes@v0.7.1/kernel/*  "."
-	sudo chmod +w ./kernel.json # in case copied kernel.json has no write permission
-	sudo sed "s|gophernotes|$(go env GOPATH)/bin/gophernotes|" < kernel.json.in > kernel.json
