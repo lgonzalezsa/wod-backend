@@ -229,7 +229,7 @@
       become_user: root
       cron:
         name: upd
-        minute: "{{ 60 | random }} "
+        minute: "{{ 59 | random(seed=inventory_hostname) }} "
         hour: "03"
         user: root
         job: "/usr/local/bin/upd"
@@ -251,7 +251,7 @@
       become_user: root
       cron:
         name: upd
-        minute: "{{ 60 | random }} "
+        minute: "{{ 59 | random(seed=inventory_hostname) }} "
         hour: "04"
         user: root
         job: "/usr/local/bin/deliver"
@@ -291,7 +291,10 @@
         mode: 0750
 
     - name: Ensure that file vault_secret in {{ JUPPROC }}/ansible-jupyter/ exists 
-      shell: echo '{{ VAULTPWD }}' > "{{ JUPPROC }}/ansible-jupyter/vault_secret"
+      lineinfile:
+        path: "{{ JUPPROC }}/ansible-jupyter/vault_secret"
+        regexp: '^{{ VAULTPWD }}$'
+        line: '{{ VAULTPWD }}'
    
     - name: Fix modes for {{ JUPPROC }}/ansible-jupyter/vault_secret
       file: 
