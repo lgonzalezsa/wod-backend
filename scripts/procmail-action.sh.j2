@@ -233,6 +233,8 @@ if [ $action != "RESET" ]; then
 	fi
 
 elif [ "$action" = "RESET" ]; then
+	# Avoid concurrency with CLEANUP phase
+	sleep 10
 	if [ _"`get_reset_status $id`" = _"true" ]; then
 		# Then call the reset script
 		# Now change passwd as sometimes the reset script needs to have it
@@ -252,8 +254,7 @@ elif [ "$action" = "RESET" ]; then
 			$JUPPROC/scripts/reset-$w.sh
 		fi
 
-		echo $stdid | grep -q ','
-		if [ $? -eq 0 ]; then
+		if [ $(echo $stdid | grep -c ',') -ne 0 ]; then
 			# We have a range to manage
 			min=`echo $stdid | cut -d, -f1`
 			max=`echo $stdid | cut -d, -f2`
