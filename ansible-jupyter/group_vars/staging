@@ -20,7 +20,8 @@ HPEECPCTRL2: "16.31.84.38 controller2.hpedevlab.net controller2.etc.fr.comm.hpec
 HPEECPGW1: "16.31.84.46 gateway1.hpedevlab.net gateway1.etc.fr.comm.hpecorp.net"
 HPEECPGW2: "16.31.84.37 gateway2.hpedevlab.net gateway2.etc.fr.comm.hpecorp.net"
 #LDAP Server
-LDAPSRV: "16.31.84.48 ldapsrv1.hpedevlab.net ldapsrv1.etc.fr.comm.hpecorp.net"
+LDAPSRV: "16.31.84.50 ldapsrv02.hpedevlab.net ldapsrv02.etc.fr.comm.hpecorp.net"
+#LDAPSRV: "16.31.84.48 ldapsrv1.hpedevlab.net ldapsrv1.etc.fr.comm.hpecorp.net"
 LDAPPWD: "CloudSystem$"
 LDAPPORT: "389"
 
