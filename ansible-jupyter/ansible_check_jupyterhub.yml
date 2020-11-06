@@ -230,10 +230,32 @@
       cron:
         name: upd
         minute: "{{ 60 | random }} "
-        hour: 03
+        hour: "03"
         user: root
         job: "/usr/local/bin/upd"
         cron_file: upd
+        state: present
+
+    - name: Install the deliver script
+      become: yes
+      become_user: root
+      template:
+        src: "{{ SCRIPTDIR }}/deliver.j2"
+        dest: /usr/local/bin/deliver
+        owner: root
+        group: root
+        mode: 0700
+
+    - name: Setup crontab for daily delivery of ansible instantiated files
+      become: yes
+      become_user: root
+      cron:
+        name: upd
+        minute: "{{ 60 | random }} "
+        hour: "04"
+        user: root
+        job: "/usr/local/bin/deliver"
+        cron_file: deliver
         state: present
 
     - name: Deliver reset scripts as ansible template for variable expansion
