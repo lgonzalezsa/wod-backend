@@ -1,0 +1,41 @@
+FROM ubuntu:20.04
+MAINTAINER bruno@project-builder.org
+
+ENV SCRIPTDIR $HOME/jupyter-procmail/scripts
+
+RUN apt update && apt upgrade -y
+RUN DEBIAN_FRONTEND=noninteractive apt install -y apt-transport-https curl gnupg2
+RUN echo "deb http://archive.ubuntu.com/ubuntu focal-security universe" >> /etc/apt/sources.list
+
+RUN curl https://repo.anaconda.com/pkgs/misc/gpgkeys/anaconda.asc | apt-key add -
+RUN echo "deb [arch=amd64] https://repo.anaconda.com/pkgs/misc/debrepo/conda stable main" >> /etc/apt/sources.list.d/conda.list
+RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg.asc | apt-key add -
+RUN echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" >> /etc/apt/sources.list.d/k8s.list
+
+RUN curl -o /tmp/packages-microsoft-prod.deb https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb && dpkg -i /tmp/packages-microsoft-prod.deb && rm -f /tmp/packages-microsoft-prod.deb
+RUN apt update
+RUN DEBIAN_FRONTEND=noninteractive apt install -y ansible python3 python3-dev python3-pip python3-venv python3-jmespath python3-virtualenv git acl curl wget bzip2 firefox jq httpie apt-file moreutils net-tools ldap-utils nodejs npm vim pandoc clang cargo cmake default-jre default-jdk golang texlive-xetex texlive-fonts-recommended texlive-latex-recommended aspnetcore-runtime-3.1 dotnet-runtime-3.1 dotnet-sdk-3.1 software-properties-common gnupg2 conda kubectl 
+RUN npm install -g json configurable-http-proxy
+RUN pip3 install wheel jupyterhub jupyterlab nbconvert pyhpecfm==0.1.6 hpeOneView ipywidgets ansible-kernel bash_kernel powershell_kernel
+RUN for i in bash_kernel powershell_kernel ansible_kernel; do python3 -m "$i.install"; done
+RUN dotnet tool install -g powershell
+    
+RUN ln -sf $HOME/.dotnet/tools/pwsh /usr/local/bin/pwsh
+COPY install_PwshModules.sh /tmp
+RUN chmod 755 /tmp/install_PwshModules.sh
+RUN /tmp/install_PwshModules.sh
+
+RUN jupyterhub --generate-config
+RUN echo "#####################################################################################" >> /jupyterhub_config.py
+RUN echo "c.Authenticator.admin_users = {'jupyter'}" >> /jupyterhub_config.py
+RUN echo "c.Authenticator.whitelist = {'jupyter'}" >> /jupyterhub_config.py
+RUN echo "c.Spawner.default_url = '/lab'" >> /jupyterhub_config.py
+RUN echo "c.JupyterHub.tornado_settings = {'cookie_options': {'expires_days': 0.17}}" >> /jupyterhub_config.py
+RUN echo "c.JupyterHub.shutdown_on_logout = True" >> /jupyterhub_config.py
+RUN echo "c.JupyterHub.redirect_to_server = True" >> /jupyterhub_config.py
+RUN echo "#####################################################################################" >> /jupyterhub_config.py
+
+RUN useradd jupyter
+
+EXPOSE 8000
+CMD jupyterhub -f /jupyterhub_config.py
