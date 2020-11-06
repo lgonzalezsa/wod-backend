@@ -283,10 +283,21 @@
         name: jupyterhub
 
     - name: Test Jupyterhub token
+      get_url: 
+        url: "{{ JPHUBAPISRV }}/hub/api/users/jupyter"
+        dest: /dev/null
+        headers:
+          Authorization: "token {{ JPHUBTOKEN }}"
+      register: answer
+      ignore_errors: true
+      changed_when: false
+
+    - name: Build a new Jupyterhub token
       shell: . '{{ JPHUB }}/bin/activate' && '{{ JPHUB }}/bin/jupyterhub' token jupyter -f '{{ JPHUB }}/etc/jupyterhub/jupyterhub_config.py' | tail -1
       register: jup_token
       ignore_errors: true
       changed_when: false
+      when: answer.status_code != 200
 
     - name: Fix Jupyter token in conf file
       lineinfile:
@@ -294,6 +305,7 @@
         regexp: "^JPHUBTOKEN"
         line: "JPHUBTOKEN: {{ jup_token.stdout_lines[0] }}"
         state: present
+      when: answer.status_code != 200
 
     - name: Enable postfix service 
       become: yes
