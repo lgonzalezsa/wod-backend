@@ -34,6 +34,7 @@ RUN echo "c.JupyterHub.tornado_settings = {'cookie_options': {'expires_days': 0.
 RUN echo "c.JupyterHub.shutdown_on_logout = True" >> /jupyterhub_config.py
 RUN echo "c.JupyterHub.redirect_to_server = True" >> /jupyterhub_config.py
 RUN echo "#####################################################################################" >> /jupyterhub_config.py
+RUN jupyterhub token jupyter -f /jupyterhub_config.py | tail -1 > /jupyter-token
 
 RUN useradd jupyter
 

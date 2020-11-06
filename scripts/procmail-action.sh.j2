@@ -207,7 +207,7 @@ if [ $action != "RESET" ]; then
                                 "{{ JPHUBAPISRV }}/hub/api/users/student$stdid/server" 
 			#Get Worshop reset status to determine if users should be updated to inactive or not
 			if [ _"`get_reset_status $id`" = _"false" ]; then
-				##Update customer status to inactive
+				##Update student status to inactive
 				curl --header "Content-Type: application/json" \
   					--request PUT \
   					--data '{"assigned":"false"}' \
