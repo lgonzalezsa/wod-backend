@@ -304,7 +304,7 @@
         line: "sshCommand = ssh -i ~/.ssh/id_student0 -F /dev/null"
         insertafter: '^\s+logallrefupdates'
 
-    - name: Fix git config for future commit on juŷter-procmail
+    - name: Fix git config for future commit on jupyter-procmail
       lineinfile:
         path: "{{ JUPPROC }}/.git/config"
         line: "sshCommand = ssh -i ~/.ssh/id_jupproc -F /dev/null"

@@ -260,6 +260,19 @@
         enabled: yes
         name: jupyterhub
 
+    - name: Test Jupyterhub token
+      shell: . '{{ JPHUB }}/bin/activate' && '{{ JPHUB }}/bin/jupyterhub' token jupyter -f '{{ JPHUB }}/etc/jupyterhub/jupyterhub_config.py' | tail -1
+      register: jup_token
+      ignore_errors: true
+      changed_when: false
+
+    - name: Fix Jupyter token in conf file
+      lineinfile:
+        path: "{{ JUPPROC }}/ansible-jupyter/group_vars/{{ PBKDIR }}"
+        regexp: "^JPHUBTOKEN"
+        line: "JPHUBTOKEN: {{ jup_token.stdout_lines[0] }}"
+        state: present
+
     - name: Enable postfix service 
       become: yes
       become_user: root

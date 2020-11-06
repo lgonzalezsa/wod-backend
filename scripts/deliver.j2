@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd {{ JUPPROC }}/ansible-jupyter
+ansible-playbook -i inventory --limit {{ PBKDIR }} ansible_check_jupyterhub.yml
