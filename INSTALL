@@ -13,14 +13,15 @@
 	ssh server ok
 
 Autoinstall with ansible and sshd
-setup jupyter account
+cleanup potential old apt setup
+cleanup potential /usr/local/bin content
+setup jupyter account (or rename previous one)
 setup ssh
 copy ssh keys from another jupyterhub server
 add id_rsa.pub in authorized_keys
 ssh localhost ls
 setup sudo:
   jupyter ALL=(ALL) NOPASSWD:ALL
-copy .gitconfig & .git/config
 
 GIT_SSH_COMMAND='ssh -i ~/.ssh/id_jupproc -v ' git clone git@github.com:HPEDevCom/jupyter-procmail.git
 cd jupyter-procmail
@@ -35,20 +36,3 @@ Priorities: rust, java, go
     sudo mkdir /opt/conda/envs/
     sudo /opt/conda/bin/conda create --prefix /opt/conda/envs/python python=3.7 ipykernel
     sudo /opt/conda/envs/python/bin/python -m ipykernel install --prefix=/opt/jupyterhub/ --name 'python' --display-name "Python (default)"
-  
-	### Install Java Kernel
-	#install from https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-on-ubuntu-18-04-fr
-	#Definition Java$Home
-	sudo update-alternatives --config java
-	#Install Java kernel from  https://github.com/SpencerPark/IJava
-	#Download the release from the releases tab. A prepackaged distribution will be in an artifact named ijava-$version.zip AND unzip it into a temporary location. It should have at least the install.py and java folder extracted in there.
-	cd /
-	mkdir test
-	cd test
-	wget https://github.com/SpencerPark/IJava/releases/download/v1.3.0/ijava-1.3.0.zip
-	unzip ijava-1.3.0.zip
-	#Run the installer with the same python command used to install jupyter. The installer is a python script and has the same options as jupyter kernelspec install but additionally supports configuring some of the kernel properties mentioned further below in the README.
-	sudo /opt/jupyterhub/bin/python3 install.py
-	#Result is: 
-	Installed java kernel into "/usr/local/share/jupyter/kernels/java"
-
