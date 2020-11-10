@@ -254,7 +254,7 @@
         dest: "{{ ansible_env.HOME }}"
         remote_src: yes
 
-    - name: Ensure jupyter IJave kernel is installed
+    - name: Ensure jupyter IJava kernel is installed
       shell: . '{{ JPHUB }}/bin/activate' && cd {{ ansible_env.HOME }} && python3 install.py --prefix={{ JPHUB }}
 
     - name: Ensure jupyter kernels are installed
@@ -328,12 +328,17 @@
     - name: Test Jupyterhub token
       get_url: 
         url: "{{ JPHUBAPISRV }}/hub/api/users/jupyter"
-        dest: /dev/null
+        dest: "/tmp/result.{{ JPHUBTOKEN }}"
         headers:
           Authorization: "token {{ JPHUBTOKEN }}"
       register: answer
       ignore_errors: true
       changed_when: false
+
+    - name: Remove temporary file
+      file:
+        path: "/tmp/result.{{ JPHUBTOKEN }}"
+        state: absent
 
     - name: Build a new Jupyterhub token
       shell: . '{{ JPHUB }}/bin/activate' && '{{ JPHUB }}/bin/jupyterhub' token jupyter -f '{{ JPHUB }}/etc/jupyterhub/jupyterhub_config.py' | tail -1
