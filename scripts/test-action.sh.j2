@@ -1,25 +1,60 @@
 #!/bin/bash
+#
+
 ACTION=$1
-echo "we are working on "$ACTION
 if [ _"$1" = _"" ]; then
-	echo "Syntax: test-action.sh <CREATE|CLEANUP|RESET>"
+	echo "Syntax: test-action.sh <CREATE|CLEANUP|RESET> WKSHOP [MIN[,MAX]"
 	echo "ACTION is mandatory"
 	exit -1
 fi
+echo "we are working on "$ACTION
 shift
+
+WKSHP=$1
+if [ _"$1" = _"" ]; then
+	echo "Syntax: test-action.sh <CREATE|CLEANUP|RESET> WKSHOP [MIN[,MAX]"
+	echo "WKSHP is mandatory"
+	exit -1
+fi
+echo "we are working on "$ACTION
+shift
+
+STDRANGE=$1
+if [ _"$STDRANGE" != _"" ]; then
+	echo "Student range: "$STDRANGE
+	STDMIN=`echo $STDRANGE | cut -d, -f1`
+	STDMAX=`echo $STDRANGE | cut -d, -f2`
+	if [ _"$STDMAX" = _"" ]; then
+		STDMAX=$STDMIN
+	fi
+	if [ $STDMIN -gt $STDMAX ]; then
+		echo "Syntax: test-action.sh <CREATE|CLEANUP|RESET> WKSHOP [MIN[,MAX]"
+		echo "MIN should be lesser than MAX"
+		exit -1
+	fi
+fi
+shift
+
 
 # Check action
 if [ $ACTION != "CREATE" ]  && [ $ACTION != "CLEANUP" ]  && [ $ACTION != "RESET" ]; then
-	echo "Syntax: test-action.sh <CREATE|CLEANUP|RESET>"
+	echo "Syntax: test-action.sh <CREATE|CLEANUP|RESET> WKSHOP [MIN[,MAX]"
 	echo "A correct ACTION is mandatory"
 	exit -1
 fi
-(
-	echo "MAIL FROM: hpedev.hackshack@hpe.com"
-	echo "RCPT TO: jupyter@`hostname`"
-	echo "DATA"
-	echo "Subject: $ACTION 1246 4" 
-	echo " "
-	echo "WKSHP-API101"
-	echo "."
-) | telnet localhost {{ POSTPORT }}
+i=$STDMIN
+while [ $i -le $STDMAX ]; do
+	cat > /tmp/mail.$$ << EOF
+MAIL FROM: hpedev.hackshack@hpe.com
+RCPT TO: jupyter@`hostname`
+DATA
+Subject: $ACTION $i 0
+
+$WKSHP
+.
+EOF
+	echo "Sending a mail to $ACTION student $i for workshop $WKSHP"
+	cat /tmp/mail.$$ | telnet localhost {{ POSTPORT }}
+	((i=i+1))
+done
+rm -f /tmp/mail.$$

@@ -92,8 +92,12 @@ erase_student() {
 #this function creates a random password for a user, it is used for local and ldap users'passwords.
 generate_randompwd() {
 
-       export randompw=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
-       echo "student$stdid:$randompw" | sudo chpasswd
+	if [ _"$RANDOMPW" != _"" ]; then
+		export randompw=$RANDOMPW
+	else
+		export randompw=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)
+	fi
+	echo "student$stdid:$randompw" | sudo chpasswd
 }
 
 #

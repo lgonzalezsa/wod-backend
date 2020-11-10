@@ -14,7 +14,8 @@
 
 Autoinstall with ansible and sshd
 cleanup potential old apt setup
-cleanup potential /usr/local/bin content
+cleanup potential /usr/local/{bin,lib,go} content
+stop a potentially running jupyter service
 setup jupyter account (or rename previous one)
 setup ssh
 copy ssh keys from another jupyterhub server
