@@ -238,14 +238,36 @@ elif [ "$action" = "RESET" ]; then
 	# Avoid concurrency with CLEANUP phase
 	sleep 10
 	if [ _"`get_reset_status $id`" = _"true" ]; then
-		# Then call the reset script
-		# Now change passwd as sometimes the reset script needs to have it
-		generate_randompwd
-
-		# Some Notebooks need an LDAP passwd update as well
-		if [ _"`get_ldap_status $id`" != _"false" ]; then
-			update_ldap_passwd
+		if [ $(echo $stdid | grep -c ',') -ne 0 ]; then
+			# We have a range to manage
+			min=`echo $stdid | cut -d, -f1`
+			max=`echo $stdid | cut -d, -f2`
+			min=$((min+{{ BASESTDID }}))
+			max=$((max+{{ BASESTDID }}))
+			i=$max
+			j=$max
+			cap=$((max-min+1))
+		else
+			# We have a single value to manage
+			i=$((stdid+{{ BASESTDID }}))
+			j=$((stdid+{{ BASESTDID }}))
+			min=$((stdid+{{ BASESTDID }}))
+			max=-1
+			cap=1
 		fi
+
+		while [ $i -ge $min ]; do
+			# Then call the reset script
+			# Now change passwd as sometimes the reset script needs to have it
+			stdid=$i
+			generate_randompwd
+	
+			# Some Notebooks need an LDAP passwd update as well
+			if [ _"`get_ldap_status $id`" != _"false" ]; then
+				update_ldap_passwd
+			fi
+			((i=i-1))
+		done
 
 		# Get Workshop backend reset status
 		if [ ! -x "$JUPPROC/scripts/reset-$w.sh" ]; then
@@ -256,39 +278,24 @@ elif [ "$action" = "RESET" ]; then
 			$JUPPROC/scripts/reset-$w.sh
 		fi
 
-		if [ $(echo $stdid | grep -c ',') -ne 0 ]; then
-			# We have a range to manage
-			min=`echo $stdid | cut -d, -f1`
-			max=`echo $stdid | cut -d, -f2`
-			min=$((min+{{ BASESTDID }}))
-			max=$((max+{{ BASESTDID }}))
-			i=$max
-			cap=$((max-min+1))
-		else
-			# We have a single value to manage
-			i=$((stdid+{{ BASESTDID }}))
-			min=$((stdid+{{ BASESTDID }}))
-			cap=1
-		fi
-
-		while [ $i -ge $min ]; do
-			# API call
-			##Update customer status to inactive
-			# API call TBD (active or assigned ?)
-			curl --header "Content-Type: application/json" \
-  				--request PUT \
-  				--data '{"assigned":"false"}' \
-  				"$APIENDPOINT/student/$i"
-			((i=i-1))
-		done
-
-		# API call to Now reset capacity to original value
+		# API call to Now reset capacity to original value (TODO: Check with pramod)
 	        curl --header "Content-Type: application/json" \
   			--request PUT \
   			--data '{"capacity":"'$cap'"}' \
   			"$APIENDPOINT/workshop/$id"
 
-		erase_student
+		while [ $j -ge $min ]; do
+			# API call
+			# Update customer status to inactive
+			curl --header "Content-Type: application/json" \
+  				--request PUT \
+  				--data '{"assigned":"false"}' \
+  				"$APIENDPOINT/student/$j"
+			stdid=$j
+			stddir="/student/student$stdid"
+			erase_student
+			((j=j-1))
+		done
 	fi
 
 else
