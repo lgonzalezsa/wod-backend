@@ -2,3 +2,4 @@ scripts/procmail-action.sh
 scripts/test-action.sh
 scripts/reset-*.sh
 jupyterhub.sqlite
+ansible-jupyter/*/*_pass.yml
