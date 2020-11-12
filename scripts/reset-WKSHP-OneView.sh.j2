@@ -2,15 +2,15 @@
 #
 # script to reset OneView backend
 #Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false
-$servername = {{ VCENTERAPP }}
-$username = {{ VCENTERADMIN }}
-$password = {{ VCENTERPWD }}
+$servername = "{{ VCENTERAPP }}"
+$username = "{{ VCENTERADMIN }}"
+$password = "{{ VCENTERPWD }}"
 #Reverting HPE OneView Simulator 1 VM
 #Set Vm name as variable
-$vmsimu1 = {{ OVVMSIMU1 }}
+$vmsimu1 = "{{ OVVMSIMU1 }}"
 #Reverting HPE OneView Simulator 2 VM
 #Set Vm name as variable
-$vmsimu2 = {{ OVVMSIMU2 }}
+$vmsimu2 = "{{ OVVMSIMU2 }}"
 #-------------------------------------------------------------
 #Connect to Vcenter appliance :
 connect-viserver $servername -username $username -password $password
