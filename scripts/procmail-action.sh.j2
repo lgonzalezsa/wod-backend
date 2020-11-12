@@ -247,13 +247,17 @@ elif [ "$action" = "RESET" ]; then
 			i=$max
 			j=$max
 			cap=$((max-min+1))
+
+			# API call to Now reset capacity to original value
+	        	curl --header "Content-Type: application/json" \
+  				--request PUT \
+  				--data '{"capacity":"'$cap'"}' \
+  				"$APIENDPOINT/workshop/$id"
 		else
 			# We have a single value to manage
 			i=$((stdid+{{ BASESTDID }}))
 			j=$((stdid+{{ BASESTDID }}))
 			min=$((stdid+{{ BASESTDID }}))
-			max=-1
-			cap=1
 		fi
 
 		while [ $i -ge $min ]; do
@@ -277,12 +281,6 @@ elif [ "$action" = "RESET" ]; then
         		echo "Reseting workshop $w Backend"
 			$JUPPROC/scripts/reset-$w.sh
 		fi
-
-		# API call to Now reset capacity to original value (TODO: Check with pramod)
-	        curl --header "Content-Type: application/json" \
-  			--request PUT \
-  			--data '{"capacity":"'$cap'"}' \
-  			"$APIENDPOINT/workshop/$id"
 
 		while [ $j -ge $min ]; do
 			# API call
