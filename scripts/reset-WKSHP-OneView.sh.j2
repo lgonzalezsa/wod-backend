@@ -2,6 +2,9 @@
 #
 # script to reset OneView backend
 #Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -Confirm:$false
+#
+Set-PowerCLIConfiguration -InvalidCertificateAction Ignore -DisplayDeprecationWarnings $false -Scope AllUsers -Confirm:$false
+
 $servername = "{{ VCENTERAPP }}"
 $username = "{{ VCENTERADMIN }}"
 $password = "{{ VCENTERPWD }}"
