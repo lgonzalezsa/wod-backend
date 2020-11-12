@@ -193,17 +193,16 @@
         dest: "{{ ansible_env.HOME }}/.procmailrc"
         mode: 0600
 
-    - name: Deploy an instanciated procmail-action script
+    - name: Deploy instanciated scripts
       template:
-        src: "{{ SCRIPTDIR }}/procmail-action.sh.j2"
-        dest: "{{ SCRIPTDIR }}/procmail-action.sh"
+        src: "{{ SCRIPTDIR }}/{{ item }}.j2"
+        dest: "{{ SCRIPTDIR }}/{{ item }}"
         mode: 0700
-
-    - name: Deploy an instanciated test-action script
-      template:
-        src: "{{ SCRIPTDIR }}/test-action.sh.j2"
-        dest: "{{ SCRIPTDIR }}/test-action.sh"
-        mode: 0700
+      with_items:
+        - procmail-action.sh
+        - test-action.sh
+        - cleanup-users.sh
+        - functions.sh
 
     - name: Enable postfix service 
       become: yes
