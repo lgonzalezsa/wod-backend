@@ -5,8 +5,8 @@ JPHOSTEXT: notebooks.hpedev.io
 JPHUBAPISRV: http://{{ JPHOST }}:8000
 JPHUBTOKEN: 2c0246e2c8564dc6ac7b12c544b25d77
 BASESTDID: 0
-#APIENDPOINT: https://hackshackchallenge.hpedev.io/api
-APIENDPOINT: https://hackshackondemand.hpedev.io/api
+APIENDPOINT: https://hackshackchallenge.hpedev.io/api
+#APIENDPOINT: https://hackshackondemand.hpedev.io/api
 #
 VCENTERAPP: "vcenter-hpedev.etc.fr.comm.hpecorp.net"
 VCENTERADMIN: "root"
