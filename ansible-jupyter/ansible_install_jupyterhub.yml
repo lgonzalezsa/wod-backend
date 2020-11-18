@@ -89,6 +89,9 @@
         - python3-venv 
         - python3-jmespath 
         - python3-virtualenv 
+        - python3-wheel
+        - python3-nbconvert
+        - python3-ipywidgets
         - git 
         - acl 
         - curl 
@@ -142,13 +145,10 @@
     - name: Remove a set of existing pip packages
       pip:
         name:
-        - wheel 
         - jupyterhub 
         - jupyterlab 
-        - nbconvert
         - pyhpecfm==0.1.6
         - hpeOneView
-        - ipywidgets
         - ansible-kernel
         - bash_kernel
         - powershell_kernel
@@ -181,13 +181,10 @@
     - name: Ensure all required pip packages are installed
       pip:
         name:
-        - wheel 
         - jupyterhub 
         - jupyterlab 
-        - nbconvert
         - pyhpecfm==0.1.6
         - hpeOneView
-        - ipywidgets
         - ansible-kernel
         - bash_kernel
         - powershell_kernel
