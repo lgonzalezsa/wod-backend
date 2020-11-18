@@ -3,7 +3,7 @@ JPHOST: jupyterhub2.hp.local
 JPIP: 192.168.10.127
 JPHOSTEXT: notebooks2.hpedev.io
 JPHUBAPISRV: http://{{ JPHOST }}:8000
-JPHUBTOKEN: 357f344d57d54e9882004f2d762bb920
+JPHUBTOKEN: 5cffc9264f56470c889f13a420c6c971
 BASESTDID: 800
 APIENDPOINT: https://hackshackondemand.hpedev.io/api
 #

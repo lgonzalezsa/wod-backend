@@ -115,8 +115,11 @@
         - texlive-fonts-recommended 
         - texlive-latex-recommended
         - aspnetcore-runtime-3.1
+        - aspnetcore-runtime-5.0
         - dotnet-runtime-3.1
+        - dotnet-runtime-5.0
         - dotnet-sdk-3.1
+        - dotnet-sdk-5.0
         - software-properties-common
         - gnupg2 
         - postfix 
