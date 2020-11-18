@@ -208,7 +208,7 @@
       become: yes
       become_user: root
       systemd:
-        state: started
+        state: restarted
         daemon_reload: yes
         enabled: yes
         name: postfix
