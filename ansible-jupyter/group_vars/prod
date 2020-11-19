@@ -7,6 +7,7 @@ JPHUBTOKEN: 2c0246e2c8564dc6ac7b12c544b25d77
 BASESTDID: 0
 APIENDPOINT: https://hackshackchallenge.hpedev.io/api
 #APIENDPOINT: https://hackshackondemand.hpedev.io/api
+LDAPDMN: dc=hpedevlab,dc=net
 #
 VCENTERAPP: "vcenter-hpedev.etc.fr.comm.hpecorp.net"
 VCENTERADMIN: "root"

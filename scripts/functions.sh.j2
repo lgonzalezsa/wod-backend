@@ -48,7 +48,7 @@ update_ldap_passwd() {
 	rm -f /tmp/ldif.$$
 	cat > /tmp/ldif.$$ << EOF
 #modify user password
-dn: uid=student$stdid,ou=People,dc=hpedevlab,dc=net
+dn: uid=student$stdid,ou=People,{{ LDAPDMN }}
 changetype: modify
 replace: userPassword
 userPassword: $randompw

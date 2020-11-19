@@ -6,6 +6,7 @@ JPHUBAPISRV: http://{{ JPHOST }}:8000
 JPHUBTOKEN: 70c3dc25795f4147a61ea45a573e3ede
 BASESTDID: 0
 APIENDPOINT: https://hackshackondemand.hpedev.io/api
+LDAPDMN: dc=hpedevlab,dc=net
 #
 VCENTERAPP: "vcenter-hpedev.etc.fr.comm.hpecorp.net"
 VCENTERADMIN: "root"
