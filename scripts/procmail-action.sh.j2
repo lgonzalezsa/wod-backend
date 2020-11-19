@@ -201,7 +201,7 @@ elif [ "$action" = "RESET" ]; then
   				--request PUT \
   				--data '{"assigned":"false"}' \
   				"$APIENDPOINT/student/$j"
-			stdid=$j
+			stdid=$((j-{{ BASESTDID }}))
 			stddir="/student/student$stdid"
 			erase_student
 			((j=j-1))
