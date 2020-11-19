@@ -77,6 +77,15 @@
         update_cache: yes
       changed_when: False
 
+    - name: Ensure all conflicting packages are NOT installed
+      become: yes
+      become_user: root
+      apt:
+        pkg:
+        - cargo
+        - rustc
+        state: absent
+
     - name: Ensure all required packages are installed
       become: yes
       become_user: root
@@ -109,7 +118,6 @@
         - vim
         - pandoc
         - clang
-        - cargo
         - cmake
         - default-jre
         - default-jdk
@@ -175,8 +183,36 @@
         group: jupyter
         mode: 0751
 
+    - name: Test rust presence
+      shell: rustc --version | awk '{ print $2 }' | cut -d. -f2
+      register: rustv
+      ignore_errors: true
+      changed_when: false
+
+    - name: Download rust-init.sh
+      # as packaged version doesn't work for the Rust kernel
+      shell: "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > /tmp/rust-init-{{ JPHUBTOKEN }}.sh"
+      when: rustv.stderr or (rustv.stdout | length > 0  and (rustv.stdout_lines[0] | int) <= 43)
+
+    - name: Make rust-init.sh executable
+      file:
+        path: "/tmp/rust-init-{{ JPHUBTOKEN }}.sh"
+        mode: 0755
+      when: rustv.stderr or (rustv.stdout | length > 0  and (rustv.stdout_lines[0] | int) <= 43)
+
+    - name: Install a local up to date rust version with rust-init.sh
+      command: "/tmp/rust-init-{{ JPHUBTOKEN }}.sh -y"
+      changed_when: false
+      when: rustv.stderr or (rustv.stdout | length > 0  and (rustv.stdout_lines[0] | int) <= 43)
+
+    - name: Remove temporary file
+      file:
+        path: "/tmp/rust-init-{{ JPHUBTOKEN }}.sh"
+        state: absent
+      when: rustv.stderr or (rustv.stdout | length > 0  and (rustv.stdout_lines[0] | int) <= 43)
+
     - name: Ensure all required rust packages are installed
-      shell: cargo install cargo-script && cargo install evcxr_jupyter --no-default-features
+      shell: ". {{ ansible_env.HOME }}/.profile && cargo install cargo-script && cargo install evcxr_jupyter --no-default-features"
 
     - name: Ensure all required pip packages are installed
       pip:
