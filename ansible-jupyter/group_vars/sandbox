@@ -4,7 +4,7 @@ JPIP: 192.168.10.127
 JPHOSTEXT: notebooks2.hpedev.io
 JPHUBAPISRV: http://{{ JPHOST }}:8000
 JPHUBTOKEN: 5cffc9264f56470c889f13a420c6c971
-BASESTDID: 800
+BASESTDID: 2000
 APIENDPOINT: https://hackshackondemand.hpedev.io/api
 #
 VCENTERAPP: "vcenterapp65.hp.local"
