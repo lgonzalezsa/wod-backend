@@ -175,7 +175,7 @@ elif [ "$action" = "RESET" ]; then
 		while [ $i -ge $min ]; do
 			# Then call the reset script
 			# Now change passwd as sometimes the reset script needs to have it
-			stdid=$i
+			stdid=$((i-{{ BASESTDID }}))
 			generate_randompwd
 	
 			# Some Notebooks need an LDAP passwd update as well
