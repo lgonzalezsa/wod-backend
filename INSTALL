@@ -13,16 +13,26 @@
 	ssh server ok
 
 Autoinstall with ansible and sshd
+
 cleanup potential old apt setup
 cleanup potential /usr/local/{bin,lib,go} content
 stop a potentially running jupyter service
 setup jupyter account (or rename previous one)
 setup ssh
-copy ssh keys from another jupyterhub server
+ssh-keygen -t rsa -b 4096
 add id_rsa.pub in authorized_keys
 ssh localhost ls
+copy ssh keys from other jupyterhub servers
+id_jupproc
+id_student0
+chmod 600 id_*
+chmod 644 id_*.pub
 setup sudo:
+sudo visudo
   jupyter ALL=(ALL) NOPASSWD:ALL
+
+Install Ansible
+sudo apt install ansible -y
 
 GIT_SSH_COMMAND='ssh -i ~/.ssh/id_jupproc -v ' git clone git@github.com:HPEDevCom/jupyter-procmail.git
 cd jupyter-procmail
