@@ -304,6 +304,19 @@
         - ansible_kernel
       changed_when: False
 
+    - name: Test kubectl-hpecp presence
+      command: ls /usr/local/bin/kubectl-hpecp
+      register: kubectl_path
+      ignore_errors: true
+      changed_when: false
+
+    - name: Ensure kubectl-hpecp is installed 
+      file:
+        src: "{{ JUPPROC }}/kubectl-hpecp-5-1-Linux"
+        path: /usr/local/bin/kubectl-hpecp
+        mode: 0755
+      when: kubectl_path.rc != 0
+    
     - name: Test pwsh presence
       command: ls /usr/local/bin/pwsh
       register: pwsh_path
