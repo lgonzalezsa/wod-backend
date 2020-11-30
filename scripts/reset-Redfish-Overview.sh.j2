@@ -15,7 +15,7 @@ MaxStud=150
 ExpectedStudentString="student"
 NumOfCharsInStudentString="${#StudentString}"
 Workshop="$(echo $MyName | cut --complement -c 1-6)"
-ScriptDir="/home/jupyter/${Workshop}"
+ScriptDir="/home/jupyter/jupyter-procmail/scripts/RESET-${Workshop}"
 YmlConfiFile="${ScriptDir}/InfraConfig.yml" 
 
 SED="`which sed` -i "
@@ -70,6 +70,9 @@ myrange="${StudentNum}-{{capacity}}"
 
 # Adjust variables in Ansible config file
 $SED 's/\(^capacity: \).*$/\1'${capacity}'/; s/\(^myrange: \).*$/\1'${myrange}'/' $YmlConfiFile
+
+# Kill Student Obmc
+$APB ${ScriptDir}/KillStudentObmcs.yml
 
 # Configure Student Obmcs
 $APB ${ScriptDir}/ConfigureStudentObmcs.yml

@@ -20,7 +20,7 @@ Last seat for speaker
 
   
 
-76-150 RedFish 
+76-150 RedFishOverview 
 
 [76-95] challenges Location :  Grenoble 
 
@@ -168,4 +168,31 @@ Last seat for speaker
 
 [1200] Speakers SMES 
 
+
+1201-1275 HPE Ezmeral Data Fabrics
+
+[1201-1220] challenges  Location :  Grenoble
+
+[1221-1274] workshops Location :  Mougins
+
+[1275] speaker for live sessions
+
+
+1276-1350 HPE OneView Advanced
+
+[1276-1295] challenges  Location :  Grenoble
+
+[1296-1349] workshops Location :  Mougins
+
+[1350] speaker for live sessions
+
  
+
+1351-1425 Cloud Volumes
+
+[1351-1375] challenges  Location :  Grenoble
+
+[1376-1424] workshops Location :  Mougins
+
+[1425] speaker for live sessions
+

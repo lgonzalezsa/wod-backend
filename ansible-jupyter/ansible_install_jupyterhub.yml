@@ -153,6 +153,7 @@
         - ansible-kernel
         - bash_kernel
         - powershell_kernel
+        - redfish
         state: absent
         virtualenv: "{{ JPHUB }}"
       when: CLEAN|bool
@@ -186,6 +187,7 @@
         - ansible-kernel
         - bash_kernel
         - powershell_kernel
+        - redfish
         state: present
         virtualenv: "{{ JPHUB }}"
 
