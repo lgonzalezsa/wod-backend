@@ -93,6 +93,7 @@
         - python3-nbconvert
         - python3-ipywidgets
         - git 
+        - rsync 
         - acl 
         - curl 
         - wget 
