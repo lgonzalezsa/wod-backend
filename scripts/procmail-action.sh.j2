@@ -86,6 +86,10 @@ if [ $action != "RESET" ]; then
 
 		if [ "$action" = "CREATE" ]; then
 			erase_student
+			if [ -x "$JUPPROC/scripts/create-$w.sh" ]; then
+				echo "Setup workshop $w Backend"
+				$JUPPROC/scripts/create-$w.sh
+			fi
 			echo "Copying workshop $w content into target student dir $stddir"
 			ansible-playbook $JUPPROC/ansible-jupyter/ansible_copy_folder.yml -i $JUPPROC/ansible-jupyter/inventory --limit {{ PBKDIR }} -e "DIR=  WORKSHOP=$w STDID=$stdid" --vault-password-file $JUPPROC/ansible-jupyter/vault_secret
 		fi
