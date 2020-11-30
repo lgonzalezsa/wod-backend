@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Script to update template in dev users dirs
+
+TEMPLATE=WKSHP-Template
+
+for u in `grep /home /etc/passwd | grep -vE 'syslog|jupyter' | cut -d: -f1`; do
+	rsync -av "{{ ansible_env.HOME }}/student0/$TEMPLATE" /home/$u
+	chown $u:$u /home/$u/$TEMPLATE
+done
