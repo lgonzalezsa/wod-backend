@@ -101,37 +101,14 @@
         line: UserTasksMax=100000
         state: present
 
-    - name: Fix localhost entry in /etc/hosts
+    - name: Expand template for /etc/hosts
       become: yes
       become_user: root
-      lineinfile:
-        path: /etc/hosts
-        regexp: '^127\.0\.0\.1'
-        line: 127.0.0.1 localhost localhost.localdomain
+      template:
+        src: "{{ JUPPROC }}/hosts.j2"
+        dest: "/etc/hosts"
+        mode: 0644
         owner: root
-        group: root
-        mode: '0644'
-        state: present
-
-    - name: Ensure we have relevant entries in /etc/hosts
-      become: yes
-      become_user: root
-      lineinfile:
-        path: /etc/hosts
-        line: "{{ item }}"
-        owner: root
-        group: root
-        mode: '0644'
-        state: present
-      with_items:
-        - "{{ JPIP }} {{ JPHOST }} {{ JPHOST.split('.')[0] }}  {{ JPHOSTEXT }} {{ JPHOSTEXT.split('.')[0] }}"
-        - "{{ REDFISHILO }}"
-        - "{{ REDFISHOBMC }}"
-        - "{{ HPEECPCTRL1 }}"
-        - "{{ HPEECPCTRL2 }}"
-        - "{{ HPEECPGW1 }}"
-        - "{{ HPEECPGW2 }}"
-        - "{{ LDAPSRV }}"
 
     - name: Create directory "{{ JPHUB }}" if needed
       become: yes
