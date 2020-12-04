@@ -3,5 +3,6 @@ scripts/test-action.sh
 scripts/functions.sh
 scripts/cleanup-users.sh
 scripts/reset-*.sh
+scripts/create-*.sh
 jupyterhub.sqlite
 ansible-jupyter/*/*_pass.yml

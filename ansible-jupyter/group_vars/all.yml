@@ -6,7 +6,7 @@ SCRIPTDIR: "{{ JUPPROC }}/scripts"
 JPHUB: /opt/jupyterhub
 CLEAN: false
 USERMIN: 1
-USERMAX: 1250
+USERMAX: 1500
 GIDBASE: 2000
 UIDBASE: 2000
 VAULTPWD: ceciestunmotdepassecompliquenomdenom!!!!!123

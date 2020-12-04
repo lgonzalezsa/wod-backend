@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# This script kills the OpenBMC simulator in the openbmcs VM
+# associated to the student. 
+
+OBMCSRV=`echo {{ OBMCSIMU }} | awk '{ print $1 }'`
+
+# Kill a potential qemu process remaining
+ssh $OBMCSRV pkill -f qemu-student$stdid

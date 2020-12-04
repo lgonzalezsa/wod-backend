@@ -131,6 +131,8 @@
         - kubectl 
         - lld
         - libzmq3-dev
+        - libgdiplus
+        - libc6-dev
         - cargo
         - rustc
 
