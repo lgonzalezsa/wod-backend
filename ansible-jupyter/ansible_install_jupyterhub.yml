@@ -56,6 +56,13 @@
         repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
         state: present
 
+    - name: Remove Microsoft repo file just in case
+      become: yes
+      become_user: root
+      file:
+        path: /etc/apt/sources.list.d/microsoft-prod.list
+        state: absent
+
     - name: Remove MicroSoft repo package
       become: yes
       become_user: root
@@ -217,7 +224,7 @@
 
     - name: Make kernel_python available under /usr/local/bin
       copy:
-        src: {{ SCRIPTDIR }}/kernel_python
+        src: "{{ SCRIPTDIR }}/kernel_python"
         dest: /usr/local/bin/kernel_python
         owner: jupyter
         group: jupyter
@@ -289,9 +296,9 @@
       changed_when: false
 
     - name: Ensure kubectl-hpecp is installed 
-      file:
+      copy:
         src: "{{ JUPPROC }}/kubectl-hpecp-5-1-Linux"
-        path: /usr/local/bin/kubectl-hpecp
+        dest: /usr/local/bin/kubectl-hpecp
         mode: 0755
       when: kubectl_path.rc != 0
     
