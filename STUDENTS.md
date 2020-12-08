@@ -20,6 +20,7 @@ Last seat for speaker
 
   
 
+
 76-150 RedFishOverview 
 
 [76-95] challenges Location :  Grenoble 
@@ -30,6 +31,7 @@ Last seat for speaker
 
   
 
+
 151- 225 OneView 
 
 [151-170] challenges Location :  Grenoble 
@@ -38,9 +40,10 @@ Last seat for speaker
 
 [225] speakers SMES 
 
+
   
 
-226- 300  AI101 /MLOPS 
+226- 300  OneView Advanced
 
 [226-245] challenges  
 
@@ -49,6 +52,7 @@ Last seat for speaker
 [300] speakers SMES 
 
   
+
 
 301-375  CSI Driver HPE CP 
 
@@ -60,6 +64,7 @@ Last seat for speaker
 
   
 
+
 376-450  API 101 
 
 [376-395] challenges 
@@ -68,9 +73,10 @@ Last seat for speaker
 
 [450] speakers SMES 
 
+
   
 
-451-525  Aruba 
+451-525  AI 101 CNN MNIST
 
 [451-470] challenges 
 
@@ -79,6 +85,7 @@ Last seat for speaker
 [525] speakers SMES 
 
   
+
 
 526-600  Grommet 
 
@@ -90,15 +97,17 @@ Last seat for speaker
 
   
 
+
 601-675 ilo-REST 
 
 [601-620] challenges 
 
 [621-674] workshops Location :  Mougins  
 
- [675] speakers SMES 
+[675] speakers SMES 
 
   
+
 
 676-750 Python101 
 
@@ -110,7 +119,8 @@ Last seat for speaker
 
   
 
-751 -825 Stackstorm101 
+
+751-825 SPIFFE-SPIRE 
 
 [751-775] Challenges 
 
@@ -119,6 +129,7 @@ Last seat for speaker
 [825] Speakers SMES 
 
   
+
 
 826-900 HPE CP  ML OPS  
 
@@ -130,6 +141,7 @@ Last seat for speaker
 
   
 
+
 901-975 HPE CP APPS Automation 
 
 [901-920] challenges  Location :  Grenoble 
@@ -140,6 +152,7 @@ Last seat for speaker
 
  
 
+
 976-1050 HPE Ml-KUB 
 
 [976-995] challenges  Location :  Grenoble 
@@ -147,6 +160,7 @@ Last seat for speaker
 [996-1049] workshops Location :  Mougins  
 
 [1050] speaker for live sessions 
+
 
  
 
@@ -157,6 +171,7 @@ Last seat for speaker
 [1076-1124] workshops Location :  Mougins  
 
 [1125] speaker for live sessions 
+
 
  
 
@@ -169,6 +184,8 @@ Last seat for speaker
 [1200] Speakers SMES 
 
 
+
+
 1201-1275 HPE Ezmeral Data Fabrics
 
 [1201-1220] challenges  Location :  Grenoble
@@ -178,7 +195,9 @@ Last seat for speaker
 [1275] speaker for live sessions
 
 
-1276-1350 HPE OneView Advanced
+
+
+1276-1350 Stackstorm 101
 
 [1276-1295] challenges  Location :  Grenoble
 
@@ -188,6 +207,7 @@ Last seat for speaker
 
  
 
+
 1351-1425 Cloud Volumes
 
 [1351-1375] challenges  Location :  Grenoble
@@ -195,4 +215,20 @@ Last seat for speaker
 [1376-1424] workshops Location :  Mougins
 
 [1425] speaker for live sessions
+
+
+
+
+1326-1400 Aruba API Yourself
+
+[1326-1345] Challenges
+
+[1346-1399] workshops Location :  Mougins   (requires Video for replay) https://www.yammer.com/hpe.com/#/files/xxxxx
+
+[1400] Speakers SMES
+
+
+
+
+
 
