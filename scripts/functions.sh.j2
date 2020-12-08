@@ -21,7 +21,7 @@ get_workshop_id() {
 			break
 		fi
 	done
-	if [ id = 0 ]; then
+	if [ $id = 0 ]; then
 		echo "Workshop ID not found remotely for $1"
 		exit -1
 	fi
