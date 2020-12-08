@@ -59,7 +59,9 @@ fi
 stddir="/student/student$stdid"
 JUPPROC=$HOME/jupyter-procmail
 std0="$HOME/student0"
-export w=`get_workshop_name`
+w=`get_workshop_name`
+# If that doesn't fail, then export the workshop name
+export w
 id=`get_workshop_id $w`
 
 # Handle CREATE and CLEANUP first
