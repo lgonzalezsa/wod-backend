@@ -1,0 +1,3 @@
+#!/bin/bash
+source /opt/jupyterhub/bin/activate
+/opt/jupyterhub/bin/python3 $*

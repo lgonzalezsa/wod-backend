@@ -207,7 +207,6 @@
         group: jupyter
         mode: 0755
 
-
     - name: Make gophernotes available under /usr/local/bin
       copy:
         src: "{{ ansible_env.HOME }}/go/bin/gophernotes"
@@ -215,6 +214,21 @@
         owner: jupyter
         group: jupyter
         mode: 0755
+
+    - name: Make kernel_python available under /usr/local/bin
+      copy:
+        src: {{ SCRIPTDIR }}/kernel_python
+        dest: /usr/local/bin/kernel_python
+        owner: jupyter
+        group: jupyter
+        mode: 0755
+
+    - name: Fix python kernel path to include virtualenv setup
+      lineinfile:
+        path: "{{ JPHUB }}//share/jupyter/kernels/python3/kernel.json"
+        regexp: '^\s*"python",'
+        line: '   "/usr/local/bin/kernel_python",'
+        state: present
 
     - name: Ensure Rust kernel directory is installed
       file:
