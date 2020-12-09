@@ -204,15 +204,20 @@
     - name: Ensure Go kernel is installed
       shell: env GO111MODULE=off go get -d -u github.com/gopherdata/gophernotes && cd "{{ ansible_env.HOME }}/go/src/github.com/gopherdata/gophernotes" && env GO111MODULE=on go install && mkdir -p {{ JPHUB }}/share/jupyter/kernels/gophernotes && cp kernel/* {{ JPHUB }}/share/jupyter/kernels/gophernotes
 
-    - name: Ensure /usr/local/bin is owned by jupyter
+    - name: Ensure required directories under /usr/local are owned by jupyter
       become: yes
       become_user: root
       file:
-        path: /usr/local/bin
+        path: "{{ item }}"
         state: directory
         owner: jupyter
         group: jupyter
         mode: 0755
+      with_items:
+        - /usr/local/bin
+        - /usr/local/share
+        - /usr/local/share/powershell
+        - /usr/local/share/powershell/Modules
 
     - name: Make gophernotes available under /usr/local/bin
       copy:
@@ -301,20 +306,20 @@
         dest: /usr/local/bin/kubectl-hpecp
         mode: 0755
       when: kubectl_path.rc != 0
-    
+
     - name: Test pwsh presence
       command: ls /usr/local/bin/pwsh
       register: pwsh_path
       ignore_errors: true
       changed_when: false
-    
+
     - name: Ensure powershell is installed through dotnet
       command: dotnet tool install --tool-path /usr/local/bin powershell
       when: pwsh_path.rc != 0
-    
+
     - name: Ensure powershell scripts are installed
       command: "{{ SCRIPTDIR }}/install_PwshModules.sh"
-    
+
     - name: Ensure that directory "{{ JPHUB }}/etc/jupyterhub" exists
       file:
         path: "{{ JPHUB }}/etc/jupyterhub"
