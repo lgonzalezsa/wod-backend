@@ -34,6 +34,9 @@ sudo visudo
 Install Ansible
 sudo apt install ansible -y
 
+# End of snapshot
+
+scp -p jupyterhub3:.ssh/id_jupp'*' ~/.ssh/
 GIT_SSH_COMMAND='ssh -i ~/.ssh/id_jupproc -v ' git clone git@github.com:HPEDevCom/jupyter-procmail.git
 cd jupyter-procmail
 ./scripts/install_jupyter.sh
