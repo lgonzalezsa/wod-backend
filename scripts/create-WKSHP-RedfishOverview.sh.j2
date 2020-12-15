@@ -14,22 +14,22 @@ FWDPORTRF=$((45000+$stdid))
 {{ SCRIPTDIR }}/reset-$w.sh
 
 # Copy QEMU base images for this student
-ssh {{ OBMCSIMUNAME }} cp -a $KITPATH/flash-palmetto-ssh-student $KITPATH/student$stdid-Obmc.mtd
+ssh {{ OBMCSIMUIP }} cp -a $KITPATHVM/flash-palmetto-ssh-student $KITPATHVM/student$stdid-Obmc.mtd
 
-ssh {{ ILOSIMUNAME }} cp -a $KITPATH/VMs/RedfishMockups/ilo5 $KITPATH/VMs/RedfishMockups/student$stdid-ilo5
+ssh {{ ILOSIMUIP }} cp -a $KITPATH/VMs/RedfishMockups/ilo5 $KITPATH/VMs/RedfishMockups/student$stdid-ilo5
 
 
 # Start Obmc and ilo5 simulators
-ssh {{ OBMCSIMUNAME }} "nohup $KITPATH/qemu-system-arm -m 512 -M palmetto-bmc \
+ssh {{ OBMCSIMUIP }} "nohup $KITPATHVM/qemu-system-arm -m 512 -M palmetto-bmc \
         -net nic,macaddr=C0:FF:EE:00:$stdid:01,model=ftgmac100      \
         -net user,id=netdev0,hostfwd=:{{ OBMCSIMUIP }}:${FWDPORTSSH}-:22,hostfwd=::${FORWARDPORTHTTPS}-:443,hostname=qemu-student$stdid \
-        -drive file=$KITPATH/student$stdid-Obmc.mtd,format=raw,if=mtd     \
+        -drive file=$KITPATHVM/student$stdid-Obmc.mtd,format=raw,if=mtd     \
         -nographic > /dev/null 2>&1 &"
 
-ssh {{ ILOSIMUNAME }} "cd $KITPATHRF ; source ../bin/activate ; \
+ssh {{ ILOSIMUIP }} "cd $KITPATHRF ; source ../bin/activate ; \
 nohup python3 redfishMockupServer.py  \
     --ssl \
     --cert $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
     --key  $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
-    --host {{ ILOSIMUNAME }} --port ${FWDPORTRF} \
+    --host {{ ILOSIMUIP }} --port ${FWDPORTRF} \
     -D $KITPATH/VMs/RedfishMockups/student$stdid-ilo5  > /dev/null 2>&1 &"
