@@ -16,10 +16,8 @@ OVVMSIMU2: "HPE_OneView_DCS_5.30_Simu2"
 # Used by Francois for Redfish notebooks
 REDFISHILO: "192.168.10.5 ilo5"
 # Virtual Machine containing Francois' OpenBMCs simulators
-OBMCSIMU: "192.168.10.70 openbmcsimulators"
 OBMCSIMUIP: "192.168.10.70"
 OBMCSIMUNAME: "openbmcsimulators"
-ILOSIMU: "192.168.10.69 ilo5simulators"
 ILOSIMUIP: "192.168.10.69"
 ILOSIMUNAME: "ilo5simulators"
 

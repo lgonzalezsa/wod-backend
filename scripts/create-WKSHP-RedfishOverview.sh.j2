@@ -11,23 +11,21 @@ FWDPORTHTTPS=$((44000+$stdid))
 {{ SCRIPTDIR }}/reset-$w.sh
 
 # Copy QEMU base images for this student
-OBMCSRV=`echo {{ OBMCSIMU }} | awk '{ print $1 }'`
-ssh $OBMCSRV cp -a $KITPATH/flash-palmetto-ssh-student $KITPATH/student$stdid-Obmc.mtd
+ssh {{ OBMCSIMUNAME }} cp -a $KITPATH/flash-palmetto-ssh-student $KITPATH/student$stdid-Obmc.mtd
 
-ILO5SIMUSRV=`echo {{ ILOSIMU }} | awk '{ print $1 }'`
-ssh $ILO5SIMUSRV cp -a $KITPATH/flash-palmetto-ssh-student $KITPATH/student$stdid-Obmc.mtd
+ssh {{ ILOSIMUNAME }} cp -a $KITPATH/flash-palmetto-ssh-student $KITPATH/student$stdid-Obmc.mtd
 
 
 # Start Obmc and ilo5 simulators
-ssh $OBMCSRV "nohup $KITPATH/qemu-system-arm -m 512 -M palmetto-bmc \
+ssh {{ OBMCSIMUNAME }} "nohup $KITPATH/qemu-system-arm -m 512 -M palmetto-bmc \
         -net nic,macaddr=C0:FF:EE:00:$stdid:01,model=ftgmac100      \
-        -net user,id=netdev0,hostfwd=:${OBMCSRV}:${FWDPORTSSH}-:22,hostfwd=::${FORWARDPORTHTTPS}-:443,hostname=qemu-student$stdid \
+        -net user,id=netdev0,hostfwd=:{{ OBMCSIMUIP }}:${FWDPORTSSH}-:22,hostfwd=::${FORWARDPORTHTTPS}-:443,hostname=qemu-student$stdid \
         -drive file=$KITPATH/student$stdid-Obmc.mtd,format=raw,if=mtd     \
         -nographic > /dev/null 2>&1 &"
 
 
-ssh $ILO5SIMUSRV "nohup $KITPATH/qemu-system-arm -m 512 -M palmetto-bmc \
+ssh {{ ILOSIMUNAME }} "nohup $KITPATH/qemu-system-arm -m 512 -M palmetto-bmc \
         -net nic,macaddr=C0:FF:EE:00:$stdid:01,model=ftgmac100      \
-        -net user,id=netdev0,hostfwd=:${OBMCSRV}:${FWDPORTSSH}-:22,hostfwd=::${FORWARDPORTHTTPS}-:443,hostname=qemu-student$stdid \
+        -net user,id=netdev0,hostfwd=:{{ ILOSIMUIP }}:${FWDPORTSSH}-:22,hostfwd=::${FORWARDPORTHTTPS}-:443,hostname=qemu-student$stdid \
         -drive file=$KITPATH/student$stdid-Obmc.mtd,format=raw,if=mtd     \
         -nographic > /dev/null 2>&1 &"

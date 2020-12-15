@@ -15,10 +15,8 @@ VCENTERPWD: "vmware"
 # Used by Francois for Redfish notebooks
 REDFISHILO: "16.31.87.100 ilo5"
 # Virtual Machine containing Francois' OpenBMCs simulators
-OBMCSIMU: "16.31.86.77 openbmcsimulators"
 OBMCSIMUIP: "16.31.86.77:
 OBMCSIMUNAME: "openbmcsimulators"
-ILOSIMU: "16.31.86.81 ilo5simulators"
 ILOSIMUIP: "16.31.86.81"
 ILOSIMUNAME: "ilo5simulators"
 HPEECPCTRL: "16.31.84.38 controller2 controller2.hpedevlab.net controller2.etc.fr.comm.hpecorp.net"
