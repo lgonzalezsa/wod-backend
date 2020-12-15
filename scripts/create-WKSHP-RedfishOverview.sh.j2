@@ -22,7 +22,7 @@ ssh {{ ILOSIMUIP }} cp -a $KITPATH/VMs/RedfishMockups/ilo5 $KITPATH/VMs/RedfishM
 # Start Obmc and ilo5 simulators
 ssh {{ OBMCSIMUIP }} "nohup $KITPATHVM/qemu-system-arm -m 512 -M palmetto-bmc \
         -net nic,macaddr=C0:FF:EE:00:$stdid:01,model=ftgmac100      \
-        -net user,id=netdev0,hostfwd=:{{ OBMCSIMUIP }}:${FWDPORTSSH}-:22,hostfwd=::${FORWARDPORTHTTPS}-:443,hostname=qemu-student$stdid \
+        -net user,id=netdev0,hostfwd=:{{ OBMCSIMUIP }}:${FWDPORTSSH}-:22,hostfwd=::${FWDPORTHTTPS}-:443,hostname=qemu-student$stdid \
         -drive file=$KITPATHVM/student$stdid-Obmc.mtd,format=raw,if=mtd     \
         -nographic > /dev/null 2>&1 &"
 
