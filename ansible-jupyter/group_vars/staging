@@ -17,7 +17,7 @@ REDFISHILO: "16.31.87.100 ilo5"
 # Virtual Machine containing Francois' OpenBMCs simulators
 OBMCSIMU: "16.31.86.77 openbmcsimulators"
 OBMCSIMUIP: "16.31.86.77:
-OBMCSIMNAMEU: "openbmcsimulators"
+OBMCSIMUNAME: "openbmcsimulators"
 ILOSIMU: "16.31.86.81 ilo5simulators"
 ILOSIMUIP: "16.31.86.81"
 ILOSIMUNAME: "ilo5simulators"
