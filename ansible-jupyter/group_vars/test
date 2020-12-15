@@ -19,10 +19,10 @@ OVVMSIMU2IP: 16.31.86.250
 # Used by Francois for Redfish notebooks
 REDFISHILO: "16.31.87.207 ilo5"
 # Virtual Machine containing Francois' OpenBMCs simulators
-HPEECPCTRL1: "16.31.84.41 controller.hpedevlab.net controller1.etc.fr.comm.hpecorp.net"
-HPEECPCTRL2: "16.31.84.38 controller2.hpedevlab.net controller2.etc.fr.comm.hpecorp.net"
-HPEECPGW1: "16.31.84.46 gateway1.hpedevlab.net gateway1.etc.fr.comm.hpecorp.net"
-HPEECPGW2: "16.31.84.37 gateway2.hpedevlab.net gateway2.etc.fr.comm.hpecorp.net"
+HPEECPCTRL: "16.31.84.41 controller.hpedevlab.net controller1.etc.fr.comm.hpecorp.net"
+HPEECPGW: "16.31.84.46 gateway1.hpedevlab.net gateway1.etc.fr.comm.hpecorp.net"
+HPEECPCTRLIP: "x.y.z.t"
+HPEECPCTRLNAME: "controller2.etc.fr.comm.hpecorp.net"
 #LDAP Server
 LDAPSRV: "16.31.84.48 ldapsrv1.hpedevlab.net ldapsrv1.etc.fr.comm.hpecorp.net"
 LDAPPWD: "CloudSystem$"

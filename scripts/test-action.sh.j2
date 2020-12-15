@@ -55,7 +55,7 @@ if [ $ACTION = "WORD" ]; then
 	source "{{ JPHUB }}/bin/activate"
 	for nb in /student/student$i/$WKSHP/*.ipynb; do
 		nbo=`basename $nb .ipynb`
-		jupyter nbconvert --execute --to=docx $nb --output $nbo.docx
+		jupyter nbconvert --to=docx $nb --output $nbo.docx
 	done
 	chmod 644 /student/student$i/$WKSHP/*.docx
 	exit 0

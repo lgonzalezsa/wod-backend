@@ -17,11 +17,20 @@ OVVMSIMU2: "HPE_OneView_DCS_5.30_Simu2"
 REDFISHILO: "192.168.10.5 ilo5"
 # Virtual Machine containing Francois' OpenBMCs simulators
 OBMCSIMU: "192.168.10.70 openbmcsimulators"
+OBMCSIMUIP: "192.168.10.70"
+OBMCSIMUNAME: "openbmcsimulators"
 ILOSIMU: "192.168.10.71 ilo5simulators"
-HPEECPCTRL1: "192.168.10.220 controller.hpedevlab.net controller1.hp.local"
-HPEECPCTRL2: "192.168.10.220 controller2.hpedevlab.net controller2.hp.local"
-HPEECPGW1: "192.168.10.221 gateway1.hpedevlab.net gateway.hp.local"
-HPEECPGW2: "192.168.10.221 gateway2.hpedevlab.net gateway2.hp.local"
+ILOSIMUIP: "192.168.10.71"
+ILOSIMUNAME: "ilo5simulators"
+
+HPEECPCTRL: "192.168.10.220 controller.hpedevlab.net controller1.hp.local"
+HPEECPCTRLIP: "192.168.10.220"
+HPEECPCTRLNAME: "controller1.hp.local"
+HPEECPGW: "192.168.10.221 gateway1.hpedevlab.net gateway.hp.local"
+HPEECPGWIP: "192.168.10.221"
+HPEECPGWNAME: "gateway1.hpedevlab.net"
+
+
 #LDAP Server
 LDAPSRV: "192.168.10.228 ldapsrv02.hp.local"
 LDAPPWD: "CloudSystem$"
