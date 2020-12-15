@@ -3,9 +3,12 @@
 # This script creates the OpenBMC simulator in the openbmcs VM
 # associated to the student. 
 
-KITPATH=/usr/kits/VMs/OpenBMC
+KITPATH=/usr/kits
+KITPATHVM=$KITPATH/VMs/OpenBMC
+KITPATHRF=$KITPATH/RedfishMockupServer/Redfish-Mockup-Server
 FWDPORTSSH=$((22000+$stdid))
 FWDPORTHTTPS=$((44000+$stdid))
+FWDPORTRF=$((45000+$stdid))
 
 # Kill a potential qemu process remaining for ilo or openbmcsimulators
 {{ SCRIPTDIR }}/reset-$w.sh
@@ -13,7 +16,7 @@ FWDPORTHTTPS=$((44000+$stdid))
 # Copy QEMU base images for this student
 ssh {{ OBMCSIMUNAME }} cp -a $KITPATH/flash-palmetto-ssh-student $KITPATH/student$stdid-Obmc.mtd
 
-ssh {{ ILOSIMUNAME }} cp -a $KITPATH/flash-palmetto-ssh-student $KITPATH/student$stdid-Obmc.mtd
+ssh {{ ILOSIMUNAME }} cp -a $KITPATH/VMs/RedfishMockups/ilo5 $KITPATH/VMs/RedfishMockups/student$stdid-ilo5
 
 
 # Start Obmc and ilo5 simulators
@@ -23,9 +26,10 @@ ssh {{ OBMCSIMUNAME }} "nohup $KITPATH/qemu-system-arm -m 512 -M palmetto-bmc \
         -drive file=$KITPATH/student$stdid-Obmc.mtd,format=raw,if=mtd     \
         -nographic > /dev/null 2>&1 &"
 
-
-ssh {{ ILOSIMUNAME }} "nohup $KITPATH/qemu-system-arm -m 512 -M palmetto-bmc \
-        -net nic,macaddr=C0:FF:EE:00:$stdid:01,model=ftgmac100      \
-        -net user,id=netdev0,hostfwd=:{{ ILOSIMUIP }}:${FWDPORTSSH}-:22,hostfwd=::${FORWARDPORTHTTPS}-:443,hostname=qemu-student$stdid \
-        -drive file=$KITPATH/student$stdid-Obmc.mtd,format=raw,if=mtd     \
-        -nographic > /dev/null 2>&1 &"
+ssh {{ ILOSIMUNAME }} "cd $KITPATHRF ; source ../bin/activate ; \
+nohup python3 redfishMockupServer.py  \
+    --ssl \
+    --cert $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
+    --key  $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
+    --host {{ ILOSIMUNAME }} --port ${FWDPORTRF} \
+    -D $KITPATH/VMs/RedfishMockups/student$stdid-ilo5  > /dev/null 2>&1 &"
