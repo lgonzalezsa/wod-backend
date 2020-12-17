@@ -5,8 +5,10 @@ JPHOSTEXT: notebooks2.hpedev.io
 JPHUBAPISRV: http://{{ JPHOST }}:8000
 JPHUBTOKEN: 5cffc9264f56470c889f13a420c6c971
 BASESTDID: 2000
-APIENDPOINT: https://hackshackondemand.hpedev.io/api
+APIENDPOINT: https://hackshackchallenge.hpedev.io/api
 LDAPDMN: dc=hp,dc=local
+#
+KIBANAPWD: "5e8a3b4c-d07d-41a9-b431-6bf9495521b5"
 #
 VCENTERAPP: "vcenterapp65.hp.local"
 VCENTERADMIN: "Administrator@vsphere.local"

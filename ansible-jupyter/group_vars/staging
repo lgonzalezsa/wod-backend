@@ -8,6 +8,8 @@ BASESTDID: 0
 APIENDPOINT: https://hackshackondemand.hpedev.io/api
 LDAPDMN: dc=hpedevlab,dc=net
 #
+KIBANAPWD: "72c1dece-b99d-42e7-9442-ff6bedb8e025"
+#
 VCENTERAPP: "esx-sta-vcenter.etc.fr.comm.hpecorp.net"
 VCENTERADMIN: "root"
 VCENTERPWD: "vmware"
