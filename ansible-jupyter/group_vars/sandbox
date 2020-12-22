@@ -26,7 +26,6 @@ ILOSIMUNAME: "ilo5simulators"
 HPEECPCTRL: "192.168.10.220 controller.hpedevlab.net controller1.hp.local"
 HPEECPCTRLIP: "192.168.10.220"
 HPEECPCTRLNAME: "controller1.hp.local"
-HPEECPGW: "192.168.10.221 gateway1.hpedevlab.net gateway.hp.local"
 HPEECPGWIP: "192.168.10.221"
 HPEECPGWNAME: "gateway1.hpedevlab.net"
 
