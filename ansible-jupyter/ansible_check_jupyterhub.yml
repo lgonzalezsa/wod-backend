@@ -53,7 +53,7 @@
         - { key: "kernel.pid_max", value: "200000" }
         - { key: "vm.max_map_count", value: "600000" }
 
-    - name: Setup firewall rules
+    - name: Setup ufw firewall rules
       become: yes
       become_user: root
       community.general.ufw:
@@ -67,6 +67,22 @@
         - "80"
         - "22"
         - "{{POSTPORT}}"
+      when: ansible_pkg_mgr == 'apt'
+
+    - name: Setup firewalld rules
+      become: yes
+      become_user: root
+      ansible.posix.firewalld:
+        port: "{{ item }}/tcp"
+        permanent: yes
+        state: enabled
+      with_items:
+        - "8000"
+        - "443"
+        - "80"
+        - "22"
+        - "{{POSTPORT}}"
+      when: ansible_pkg_mgr == 'yum'
 
     - name: Ensure limits are correct for jupyter account
       lineinfile:
@@ -194,7 +210,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ SCRIPTDIR }}/upd"
+        src: "{{ SCRIPTDIR }}/upd.{{ ansible_pkg_mgr }}"
         dest: /usr/local/bin/upd
         owner: root
         group: root
