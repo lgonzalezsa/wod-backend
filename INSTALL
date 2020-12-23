@@ -22,29 +22,34 @@ setup ssh
 ssh-keygen -t rsa -b 4096
 add id_rsa.pub in authorized_keys
 ssh localhost ls
-copy ssh keys from other jupyterhub servers
-id_jupproc
-id_student0
+copy ssh keys from jupyterhub3 server
+  scp -p /home/jupyter/.ssh/id_[jms]* new:.ssh
 chmod 600 id_*
 chmod 644 id_*.pub
 setup sudo:
 sudo visudo
   jupyter ALL=(ALL) NOPASSWD:ALL
 
-Install Ansible
-sudo apt install ansible -y
+Install Ansible - Ubuntu
+sudo apt install ansible git -y
+Install Ansible - Centos7:
+sudo yum -y install epel-release
+sudo yum install -y ansible git
 
 # End of snapshot
 
-scp -p jupyterhub3:.ssh/id_jupp'*' ~/.ssh/
+
+On CentOS7:
+sudo yum -y install https://packages.endpoint.com/rhel/7/os/x86_64/endpoint-repo-1.7-1.x86_64.rpm
+sudo yum update git
+
 GIT_SSH_COMMAND='ssh -i ~/.ssh/id_jupproc -v ' git clone git@github.com:HPEDevCom/jupyter-procmail.git
+
 cd jupyter-procmail
 ./scripts/install_jupyter.sh
 
 
 #### OLD ####
-Priorities: rust, java, go
-
     #Install conda for the whole system
     sudo ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh
     sudo mkdir /opt/conda/envs/
