@@ -46,6 +46,7 @@ sudo yum update git
 GIT_SSH_COMMAND='ssh -i ~/.ssh/id_jupproc -v ' git clone git@github.com:HPEDevCom/jupyter-procmail.git
 
 cd jupyter-procmail
+check that this line is in .git/config: sshCommand = ssh -i ~/.ssh/id_jupproc -F /dev/null
 ./scripts/install_jupyter.sh
 
 
