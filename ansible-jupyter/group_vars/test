@@ -18,6 +18,11 @@ OVVMSIMU2: "STA2-HPEOneView-DCS_5.20.00-0419927"
 OVVMSIMU1IP: 16.31.86.248
 OVVMSIMU2IP: 16.31.86.250
 #
+OBMCSIMUNAME: "openbmcsimulators"
+OBMCSIMUIP: "192.168.10.70"
+ILOSIMUIP: "192.168.10.69"
+ILOSIMUNAME: "ilo5simulators"
+#
 # Used by Francois for Redfish notebooks
 REDFISHILO: "16.31.87.207 ilo5"
 # Virtual Machine containing Francois' OpenBMCs simulators
