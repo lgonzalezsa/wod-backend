@@ -88,6 +88,18 @@
         - ansible_facts['distribution'] == "CentOS"
         - ansible_facts['distribution_major_version'] >= "7"
 
+    - name: Enable firewalld service
+      become: yes
+      become_user: root
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+        name: firewalld
+      when:
+        - ansible_facts['distribution'] == "CentOS"
+        - ansible_facts['distribution_major_version'] >= "7"
+
     - name: Ensure limits are correct for jupyter account
       lineinfile:
         path: "{{ ansible_env.HOME }}/.bashrc"
