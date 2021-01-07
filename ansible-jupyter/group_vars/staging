@@ -3,12 +3,13 @@ JPHOST: jupyterhub3.etc.fr.comm.hpecorp.net
 JPIP: 16.31.85.201
 JPHOSTEXT: notebooks3.hpedev.io
 JPHUBAPISRV: http://{{ JPHOST }}:8000
-JPHUBTOKEN: 70c3dc25795f4147a61ea45a573e3ede
+JPHUBTOKEN: ee5e48b8c75b4aa6961173b1ab9d6890
 BASESTDID: 0
 APIENDPOINT: https://hackshackondemand.hpedev.io/api
 LDAPDMN: dc=hpedevlab,dc=net
 #
 KIBANAPWD: "72c1dece-b99d-42e7-9442-ff6bedb8e025"
+KIBANAPORT: "10022"
 #
 VCENTERAPP: "esx-sta-vcenter.etc.fr.comm.hpecorp.net"
 VCENTERADMIN: "root"
