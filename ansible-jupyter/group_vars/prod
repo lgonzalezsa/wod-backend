@@ -23,7 +23,7 @@ REDFISHILO: "16.31.87.207 ilo5"
 OBMCSIMUIP: "16.31.86.70"
 OBMCSIMUNAME: "openbmcsimulators"
 ILOSIMUIP: "16.31.86.76"
-ILOSIMUNAME: "Ilo5simulators"
+ILOSIMUNAME: "ilo5simulators"
 
 HPEECPCTRL: "16.31.84.36 haecpctrl haecpctrl.hpedevlab.net haecpctrl.etc.fr.comm.hpecorp.net"
 HPEECPCTRLIP: "16.31.84.36"
