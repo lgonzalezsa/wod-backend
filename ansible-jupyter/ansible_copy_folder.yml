@@ -46,6 +46,7 @@
         # Add other file types to process them as ansible templates
         patterns: 
           - "*.ipynb"
+          - "*.yaml"
           - "*.py"
           - "Variables.ps1"
         excludes: '*-checkpoint.ipynb'
@@ -95,6 +96,28 @@
         src: "{{ item.path }}"
         dest: "{{ item.path | regex_replace(STD0DIR, STDDIR + '/student' + STDID) }}"
       with_items: "{{ notebooks.files }}"
+
+    - name: Compile shc scripts in place
+      command: "shc -f {{ item.path }}"
+      with_items: "{{ SCRIPTDIR }}/*.shc"
+      when: "{{ WORKSHOP }} == WKSHP-iloREST or {{ WORKSHOP }} == WKSHP-RedfishOverview or {{ WORKSHOP }} == WKSHP-RedfishAnsible"
+
+    - name: Deliver compiled shc scripts
+      become: yes
+      become_user: root
+      copy:
+        src: "{{ item.path }}"
+        dest: "{{ item.path | regex_replace(SCRIPTDIR, STDDIR + '/student' + STDID) }}"
+        owner: student{{ STDID }}
+        group: student{{ STDID }}
+        mode: 0700
+      with_items: "{{ SCRIPTDIR }}/*.shc.x"
+      when: "{{ WORKSHOP }} == WKSHP-iloREST or {{ WORKSHOP }} == WKSHP-RedfishOverview or {{ WORKSHOP }} == WKSHP-RedfishAnsible"
+
+    - name: Remove shc scripts in place
+      command: "rm -f {{ item.path }}.c.x {{ item.path }}.x"
+      with_items: "{{ SCRIPTDIR }}/*.shc"
+      when: "{{ WORKSHOP }} == WKSHP-iloREST or {{ WORKSHOP }} == WKSHP-RedfishOverview or {{ WORKSHOP }} == WKSHP-RedfishAnsible"
 
     - name: Adapt owner/group/modes for target workshop
       become: yes

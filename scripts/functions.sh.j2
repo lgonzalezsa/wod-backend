@@ -83,10 +83,10 @@ erase_student() {
 	if [ _"$stddir" != _"" ]; then
 		echo "Erasing target student dir $stddir content"
 		sudo rm -rf $stddir/* $stddir/.??*
-		sudo cp -r -a /etc/skel/.??* $stddir
-                sudo chown -R student${stdid}:student${stdid} $stddir/.??*
-                sudo chmod -R 600 $stddir/.ssh/*
-                sudo chmod 700 $stddir/.ssh
+		sudo cp -a /etc/skel/.??* $stddir
+		sudo chown -R student${stdid}:student${stdid} $stddir/.??*
+		sudo chmod -R 600 $stddir/.ssh/*
+        	sudo chmod 700 $stddir/.ssh
 	fi
 }
 

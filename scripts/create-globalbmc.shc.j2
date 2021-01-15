@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# This script creates the OpenBMC simulator in the openbmcs VM
+# associated to the student. 
+
+KITPATH=/usr/kits
+KITPATHVM=$KITPATH/VMs/OpenBMC
+KITPATHRF=$KITPATH/RedfishMockupServer/Redfish-Mockup-Server
+
+# Test if we are launched as jupyter (initial setup ) or student (reset during workshop)
+if [ _"$USER" != _"jupyter" ]; then
+	stdid=`echo $USER | sed 's/student//'`
+	script="./reset-globalbmc.sh.x"
+else
+	script="{{ SCRIPTDIR }}/reset-$w.sh"
+fi
+echo "Re-launching simulators for id $stdid"
+FWDPORTSSH=$(({{ SSHOBMCBASEPORT }}+$stdid))
+FWDPORTHTTPS=$(({{ OBMCBASEPORT }}+$stdid))
+FWDPORTRF=$(({{ ILODLBASEPORT }}+$stdid))
+FWDPORTRFSY=$(({{ ILOSYBASEPORT }}+$stdid))
+
+# Kill a potential qemu process remaining for ilo or openbmcsimulators
+$script
+
+# Copy QEMU base images for this student
+ssh {{ OBMCSIMUIP }} cp -a $KITPATHVM/flash-palmetto-ssh-student $KITPATHVM/student$stdid-Obmc.mtd
+
+ssh {{ ILOSIMUIP }} cp -a $KITPATH/VMs/RedfishMockups/ilo5 $KITPATH/VMs/RedfishMockups/student$stdid-ilo5
+
+ssh {{ ILOSIMUIP }} cp -a $KITPATH/VMs/RedfishMockups/ilo5-Sy480 $KITPATH/VMs/RedfishMockups/student$stdid-ilo5-Sy480
+
+
+# Start Obmc and ilo5 simulators
+ssh {{ OBMCSIMUIP }} "nohup $KITPATHVM/qemu-system-arm -m 512 -M palmetto-bmc \
+        -net nic,macaddr=C0:FF:EE:00:$stdid:01,model=ftgmac100      \
+        -net user,id=netdev0,hostfwd=:{{ OBMCSIMUIP }}:${FWDPORTSSH}-:22,hostfwd=::${FWDPORTHTTPS}-:443,hostname=qemu-student$stdid \
+        -drive file=$KITPATHVM/student$stdid-Obmc.mtd,format=raw,if=mtd     \
+        -nographic > /dev/null 2>&1 &"
+
+ssh {{ ILOSIMUIP }} "cd $KITPATHRF ; source ../bin/activate ; \
+nohup python3 redfishMockupServer.py  \
+    --ssl \
+    --cert $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
+    --key  $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
+    --host {{ ILOSIMUIP }} --port ${FWDPORTRF} \
+    -D $KITPATH/VMs/RedfishMockups/student$stdid-ilo5  > /dev/null 2>&1 &"
+
+ssh {{ ILOSIMUIP }} "cd $KITPATHRF ; source ../bin/activate ; \
+nohup python3 redfishMockupServer.py  \
+    --ssl \
+    --cert $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
+    --key  $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
+    --host {{ ILOSIMUIP }} --port ${FWDPORTRFSY} \
+    -D $KITPATH/VMs/RedfishMockups/student$stdid-ilo5-Sy480  > /dev/null 2>&1 &"

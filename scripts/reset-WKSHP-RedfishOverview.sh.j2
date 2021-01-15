@@ -1,8 +1,3 @@
 #!/bin/bash
 
-# This script kills the OpenBMC simulator in the openbmcs VM
-# associated to the student. 
-
-# Kill a potential qemu process remaining
-ssh {{ OBMCSIMUIP }} pkill -f qemu-student$stdid
-ssh {{ ILOSIMUIP }} pkill -f student$stdid-ilo5
+{{ SCRIPTDIR }}/reset-globalbmc.sh

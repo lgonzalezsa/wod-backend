@@ -120,11 +120,11 @@ Last seat for speaker
   
 
 
-751-825 SPIFFE-SPIRE 
+751-825 RedfishAnsible (Using the iLO Redfish API with Ansible and OneView)
 
 [751-775] Challenges 
 
-[776-824] workshops Location :  Mougins   (requires Video for replay) https://www.yammer.com/hpe.com/#/files/690234662912 
+[776-824] workshops Location :  Mougins   (requires Video for replay) 
 
 [825] Speakers SMES 
 
@@ -229,6 +229,13 @@ Last seat for speaker
 
 
 
+1401-1475  SPIFFE SPIRE
+
+[1401-1420] challenges  Location :  Grenoble
+
+[1421-1474] workshops Location :  Mougins
+
+[1475] speaker for live sessions
 
 
 
