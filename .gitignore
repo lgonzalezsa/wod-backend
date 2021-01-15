@@ -9,3 +9,4 @@ scripts/*.x
 scripts/*.x.c
 jupyterhub.sqlite
 ansible-jupyter/*/*_pass.yml
+*.sw?

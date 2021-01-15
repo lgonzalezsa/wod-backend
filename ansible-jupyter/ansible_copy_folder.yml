@@ -99,8 +99,7 @@
 
     - name: Compile shc scripts in place
       command: "shc -f {{ item.path }}"
-      with_items: "{{ SCRIPTDIR }}/*.shc"
-      when: "{{ WORKSHOP }} == WKSHP-iloREST or {{ WORKSHOP }} == WKSHP-RedfishOverview or {{ WORKSHOP }} == WKSHP-RedfishAnsible"
+      with_items: "{{ SCRIPTDIR }}/*{{ COMPILE.split(',') }}*.shc"
 
     - name: Deliver compiled shc scripts
       become: yes
@@ -112,12 +111,11 @@
         group: student{{ STDID }}
         mode: 0700
       with_items: "{{ SCRIPTDIR }}/*.shc.x"
-      when: "{{ WORKSHOP }} == WKSHP-iloREST or {{ WORKSHOP }} == WKSHP-RedfishOverview or {{ WORKSHOP }} == WKSHP-RedfishAnsible"
 
     - name: Remove shc scripts in place
       command: "rm -f {{ item.path }}.c.x {{ item.path }}.x"
-      with_items: "{{ SCRIPTDIR }}/*.shc"
-      when: "{{ WORKSHOP }} == WKSHP-iloREST or {{ WORKSHOP }} == WKSHP-RedfishOverview or {{ WORKSHOP }} == WKSHP-RedfishAnsible"
+      with_items: "{{ SCRIPTDIR }}/*{{ COMPILE.split(',') }}*.shc"
+      #when: "{{ WORKSHOP }} == WKSHP-iloREST or {{ WORKSHOP }} == WKSHP-RedfishOverview or {{ WORKSHOP }} == WKSHP-RedfishAnsible"
 
     - name: Adapt owner/group/modes for target workshop
       become: yes

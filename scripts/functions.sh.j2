@@ -42,6 +42,13 @@ get_ldap_status() {
 	echo "$ret"
 }
 
+# This function returns the status of the need of compiled scripts for the workshop id given as parameter
+get_compile_status() {
+
+	ret=`curl -s --header "Content-Type: application/json" "$APIENDPOINT/workshops/$1" | jq -r '.compile'`
+	echo "$ret"
+}
+
 # This function updates the LDAP passwd with $randompw for the student under management (using $stdid)
 update_ldap_passwd() {
 
