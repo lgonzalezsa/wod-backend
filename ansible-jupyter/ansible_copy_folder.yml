@@ -18,6 +18,10 @@
         msg: PBKDIR variable is empty ! Fat fingers ?!?
       when: PBKDIR is not defined
 
+    - fail:
+        msg: COMPILE variable is empty ! Fat fingers ?!?
+      when: COMPILE is not defined
+
     - name: check variables file exists
       stat:
         path: "{{ VARDIR }}/variables_{{ WORKSHOP }}.yml"
@@ -100,6 +104,7 @@
     - name: Compile shc scripts in place
       command: "shc -f {{ item.path }}"
       with_items: "{{ SCRIPTDIR }}/*{{ COMPILE.split(',') }}*.shc"
+      when: COMPILE | length > 0
 
     - name: Deliver compiled shc scripts
       become: yes
@@ -111,11 +116,13 @@
         group: student{{ STDID }}
         mode: 0700
       with_items: "{{ SCRIPTDIR }}/*.shc.x"
+      when: COMPILE | length > 0
 
     - name: Remove shc scripts in place
       command: "rm -f {{ item.path }}.c.x {{ item.path }}.x"
       with_items: "{{ SCRIPTDIR }}/*{{ COMPILE.split(',') }}*.shc"
       #when: "{{ WORKSHOP }} == WKSHP-iloREST or {{ WORKSHOP }} == WKSHP-RedfishOverview or {{ WORKSHOP }} == WKSHP-RedfishAnsible"
+      when: COMPILE | length > 0
 
     - name: Adapt owner/group/modes for target workshop
       become: yes

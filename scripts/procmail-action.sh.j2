@@ -93,7 +93,10 @@ if [ $action != "RESET" ]; then
 				$JUPPROC/scripts/create-$w.sh
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook $JUPPROC/ansible-jupyter/ansible_copy_folder.yml -i $JUPPROC/ansible-jupyter/inventory --limit {{ PBKDIR }} -e "DIR=  WORKSHOP=$w STDID=$stdid COMPILE=\"`get_compile_status $id`\"" --vault-password-file $JUPPROC/ansible-jupyter/vault_secret
+			if [ _"$compile" = _"null" ]; then
+                                compile=""
+                        fi
+			ansible-playbook $JUPPROC/ansible-jupyter/ansible_copy_folder.yml -i $JUPPROC/ansible-jupyter/inventory --limit {{ PBKDIR }} -e "DIR=  WORKSHOP=$w STDID=$stdid COMPILE=\"$compile\"" --vault-password-file $JUPPROC/ansible-jupyter/vault_secret
 		fi
 
 		# Increment the student ID by Number of jupyter students in students table
