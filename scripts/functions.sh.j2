@@ -14,8 +14,8 @@ set -x
 get_workshop_id() {
 
 	id=0
-	for i in `curl -s --header "Content-Type: application/json" "$APIENDPOINT/workshops" | jq -r '.[].id'`; do
-		name=`curl -s --header "Content-Type: application/json" "$APIENDPOINT/workshops/$i" | jq .notebook | sed 's/"//g'`
+	for i in `curl -s -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" "$APIENDPOINT/workshops" | jq -r '.[].id'`; do
+		name=`curl -s -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" "$APIENDPOINT/workshops/$i" | jq .notebook | sed 's/"//g'`
 		if [ _"$name" = _"$1" ]; then
 			id=$i
 			break
@@ -31,21 +31,21 @@ get_workshop_id() {
 # This function returns the status of the reset boolean for the workshop id given as parameter
 get_reset_status() {
 
-	ret=`curl -s --header "Content-Type: application/json" "$APIENDPOINT/workshops/$1" | jq -r '.reset'`
+	ret=`curl -s -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" "$APIENDPOINT/workshops/$1" | jq -r '.reset'`
 	echo "$ret"
 }
 
 # This function returns the status of the need of LDAP setup for the workshop id given as parameter
 get_ldap_status() {
 
-	ret=`curl -s --header "Content-Type: application/json" "$APIENDPOINT/workshops/$1" | jq -r '.ldap'`
+	ret=`curl -s -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" "$APIENDPOINT/workshops/$1" | jq -r '.ldap'`
 	echo "$ret"
 }
 
 # This function returns the status of the need of compiled scripts for the workshop id given as parameter
 get_compile_status() {
 
-	ret=`curl -s --header "Content-Type: application/json" "$APIENDPOINT/workshops/$1" | jq -r '.compile'`
+	ret=`curl -s -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" "$APIENDPOINT/workshops/$1" | jq -r '.compile'`
 	echo "$ret"
 }
 
