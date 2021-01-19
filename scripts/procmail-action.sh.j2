@@ -105,14 +105,14 @@ if [ $action != "RESET" ]; then
 
 		# Instead do 2 API calls here, one for passwd change, one for status change
 		##Update Password
-		curl --header "Content-Type: application/json" \
+		curl -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" \
   			--request PUT \
   			--data '{"password":"'$randompw'"}' \
   			"$APIENDPOINT/student/$dbstdid"
 
 		if [ "$action" = "CREATE" ]; then
 			##Update customer status to active
-			curl --header "Content-Type: application/json" \
+			curl -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" \
   				--request PUT \
   				--data '{"active": "true"}' \
   				"$APIENDPOINT/customer/$userid"
@@ -133,19 +133,19 @@ if [ $action != "RESET" ]; then
 			#Get Worshop reset status to determine if users should be updated to inactive or not
 			if [ _"`get_reset_status $id`" = _"false" ]; then
 				##Update student status to inactive
-				curl --header "Content-Type: application/json" \
+				curl -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" \
   					--request PUT \
   					--data '{"assigned":"false"}' \
   					"$APIENDPOINT/student/$dbstdid"
 				# Possible to clean dirs because no RESET so no file needed in that dir
 				erase_student
 			else
-				curl --header "Content-Type: application/json" \
+				curl -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" \
   					--request PUT \
   					--data '{"assigned":"true"}' \
   					"$APIENDPOINT/student/$dbstdid"
 	 			# set customer  to inactive by default for all workshops
-        			curl --header "Content-Type: application/json" \
+        			curl -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" \
   					--request PUT \
   					--data '{"active": "false"}' \
   					"$APIENDPOINT/customer/$userid"
@@ -170,7 +170,7 @@ elif [ "$action" = "RESET" ]; then
 			cap=$((max-min+1))
 
 			# API call to Now reset capacity to original value
-	        	curl --header "Content-Type: application/json" \
+	        	curl -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" \
   				--request PUT \
   				--data '{"capacity":"'$cap'"}' \
   				"$APIENDPOINT/workshop/$id"
@@ -206,7 +206,7 @@ elif [ "$action" = "RESET" ]; then
 		while [ $j -ge $min ]; do
 			# API call
 			# Update customer status to inactive
-			curl --header "Content-Type: application/json" \
+			curl -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" \
   				--request PUT \
   				--data '{"assigned":"false"}' \
   				"$APIENDPOINT/student/$j"
