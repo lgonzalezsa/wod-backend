@@ -354,7 +354,7 @@
 
     - name: Fix python kernel path to include virtualenv setup
       lineinfile:
-        path: "{{ JPHUB }}//share/jupyter/kernels/python3/kernel.json"
+        path: "{{ JPHUB }}/share/jupyter/kernels/python3/kernel.json"
         regexp: '^\s*"python",$'
         line: '   "/usr/local/bin/kernel_python",'
         state: present
@@ -441,6 +441,12 @@
         group: jupyter
         mode: 0751
 
+    - name: Test Jupyterhub service presence
+      command: ls /etc/systemd/system/jupyterhub.service
+      register: serv_path
+      ignore_errors: true
+      changed_when: false
+
     - name: Disable Jupyterhub service
       become: yes
       become_user: root
@@ -449,6 +455,7 @@
         daemon_reload: yes
         enabled: no
         name: jupyterhub
+      when: serv_path.rc == 0
 
     - name: Remove jupyterhub configuration file
       file:
