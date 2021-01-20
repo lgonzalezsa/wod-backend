@@ -56,7 +56,7 @@ if [ $stdid -lt $MIN ] ||  [ $stdid -gt $MAX ]; then
 	exit -1
 fi
 
-stddir="/student/student$stdid"
+export stddir="{{ STDDIR }}/student$stdid"
 JUPPROC=$HOME/jupyter-procmail
 std0="$HOME/student0"
 w=`get_workshop_name`
@@ -88,15 +88,19 @@ if [ $action != "RESET" ]; then
 
 		if [ "$action" = "CREATE" ]; then
 			erase_student
+			compile=`get_compile_status $id`
+			if [ _"$compile" = _"null" ]; then
+                                compile=""
+                        fi
+			if [ _"$compile" != _"" ]; then
+				ansible-playbook $JUPPROC/ansible-jupyter/ansible_compile_scripts.yml -i $JUPPROC/ansible-jupyter/inventory --limit {{ PBKDIR }} -e "STDID=$stdid COMPILE=\"$compile\""
+			fi
 			if [ -x "$JUPPROC/scripts/create-$w.sh" ]; then
 				echo "Setup workshop $w Backend"
 				$JUPPROC/scripts/create-$w.sh
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			if [ _"$compile" = _"null" ]; then
-                                compile=""
-                        fi
-			ansible-playbook $JUPPROC/ansible-jupyter/ansible_copy_folder.yml -i $JUPPROC/ansible-jupyter/inventory --limit {{ PBKDIR }} -e "DIR=  WORKSHOP=$w STDID=$stdid COMPILE=\"$compile\"" --vault-password-file $JUPPROC/ansible-jupyter/vault_secret
+			ansible-playbook $JUPPROC/ansible-jupyter/ansible_copy_folder.yml -i $JUPPROC/ansible-jupyter/inventory --limit {{ PBKDIR }} -e "DIR=  WORKSHOP=$w STDID=$stdid" --vault-password-file $JUPPROC/ansible-jupyter/vault_secret
 		fi
 
 		# Increment the student ID by Number of jupyter students in students table

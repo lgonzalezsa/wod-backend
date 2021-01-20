@@ -1,8 +1,13 @@
 #!/bin/bash
 
-# This script kills the BMC simulators running in different simulators
-# and associated to a specific student. 
-
-# Kill a potential qemu process remaining
-ssh {{ OBMCSIMUIP }} pkill -f qemu-student$stdid
-ssh {{ ILOSIMUIP }} pkill -f student$stdid-ilo5*
+# Test if we are launched as jupyter (initial setup) or student (reset during workshop)
+if [ _"$USER" != _"jupyter" ]; then
+        script="$stddir/reset-globalbmc.shc.x"
+else
+        script="{{ SCRIPTDIR }}/reset-globalbmc.shc"
+fi
+if [ ! -x $script ]; then
+	echo "Front-end probbly not up to date wrt compile scripts to generate"
+	exit -1
+fi
+$script

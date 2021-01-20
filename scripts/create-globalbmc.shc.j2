@@ -10,7 +10,7 @@ KITPATHRF=$KITPATH/RedfishMockupServer/Redfish-Mockup-Server
 # Test if we are launched as jupyter (initial setup ) or student (reset during workshop)
 if [ _"$USER" != _"jupyter" ]; then
 	stdid=`echo $USER | sed 's/student//'`
-	script="./reset-globalbmc.sh.x"
+	script="{{ STDDIR }}/$USER/reset-globalbmc.sh.x"
 else
 	script="{{ SCRIPTDIR }}/reset-$w.sh"
 fi
