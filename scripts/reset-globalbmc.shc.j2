@@ -7,3 +7,5 @@
 ssh {{ OBMCSIMUIP }} pkill -f qemu-student$stdid
 ssh {{ ILOSIMUIP }} pkill -f student$stdid-ilo5
 ssh {{ ILOSIMUIP }} pkill -f student$stdid-ilo5-Sy480
+# do not remove so callers are happy whatever upper result
+exit 0
