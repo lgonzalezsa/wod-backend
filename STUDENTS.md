@@ -164,7 +164,7 @@ Last seat for speaker
 
  
 
-1051-1125 GIT101 
+1051-1125 KUB101 
 
 [1051-1075] challenges  Location :  Grenoble 
 
@@ -238,4 +238,21 @@ Last seat for speaker
 [1475] speaker for live sessions
 
 
+1476-1550 Git 101
+
+[1476-1495] challenges  Location :  Grenoble
+
+[1496-1549] workshops Location :  Mougins
+
+[1550] speaker for live sessions
+
+
+
+1551-1625 Docker 101
+
+[1551-1575] challenges  Location :  Grenoble
+
+[1576-1624] workshops Location :  Mougins
+
+[1625] speaker for live sessions
 

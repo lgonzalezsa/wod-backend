@@ -6,6 +6,8 @@ JPHUBAPISRV: http://{{ JPHOST }}:8000
 JPHUBTOKEN: ee5e48b8c75b4aa6961173b1ab9d6890
 BASESTDID: 0
 APIENDPOINT: https://hackshackondemand.hpedev.io/api
+APIUSER: moderator
+APIPWD: CloudSystem$
 LDAPDMN: dc=hpedevlab,dc=net
 #
 KIBANAPWD: "72c1dece-b99d-42e7-9442-ff6bedb8e025"

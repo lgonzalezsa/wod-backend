@@ -20,6 +20,8 @@ source {{ SCRIPTDIR }}/functions.sh
 
 # endpoint variable - Has to be global
 APIENDPOINT={{ APIENDPOINT }}
+APIUSER={{ APIUSER }}
+APIPWD={{ APIPWD }}
 PBKDIR={{ PBKDIR }}
 
 # Main of script
@@ -59,6 +61,7 @@ fi
 export stddir="{{ STDDIR }}/student$stdid"
 JUPPROC=$HOME/jupyter-procmail
 std0="$HOME/student0"
+accessToken=`get_session_token`
 w=`get_workshop_name`
 # If that doesn't fail, then export the workshop name
 export w
@@ -109,14 +112,14 @@ if [ $action != "RESET" ]; then
 
 		# Instead do 2 API calls here, one for passwd change, one for status change
 		##Update Password
-		curl -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" \
+		curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
   			--request PUT \
   			--data '{"password":"'$randompw'"}' \
   			"$APIENDPOINT/student/$dbstdid"
 
 		if [ "$action" = "CREATE" ]; then
 			##Update customer status to active
-			curl -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" \
+			curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
   				--request PUT \
   				--data '{"active": "true"}' \
   				"$APIENDPOINT/customer/$userid"
@@ -137,19 +140,19 @@ if [ $action != "RESET" ]; then
 			#Get Worshop reset status to determine if users should be updated to inactive or not
 			if [ _"`get_reset_status $id`" = _"false" ]; then
 				##Update student status to inactive
-				curl -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" \
+				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
   					--request PUT \
   					--data '{"assigned":"false"}' \
   					"$APIENDPOINT/student/$dbstdid"
 				# Possible to clean dirs because no RESET so no file needed in that dir
 				erase_student
 			else
-				curl -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" \
+				curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
   					--request PUT \
   					--data '{"assigned":"true"}' \
   					"$APIENDPOINT/student/$dbstdid"
 	 			# set customer  to inactive by default for all workshops
-        			curl -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" \
+        			curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
   					--request PUT \
   					--data '{"active": "false"}' \
   					"$APIENDPOINT/customer/$userid"
@@ -174,7 +177,7 @@ elif [ "$action" = "RESET" ]; then
 			cap=$((max-min+1))
 
 			# API call to Now reset capacity to original value
-	        	curl -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" \
+	        	curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
   				--request PUT \
   				--data '{"capacity":"'$cap'"}' \
   				"$APIENDPOINT/workshop/$id"
@@ -210,7 +213,7 @@ elif [ "$action" = "RESET" ]; then
 		while [ $j -ge $min ]; do
 			# API call
 			# Update customer status to inactive
-			curl -H 'Authorization: Bearer {{ TEMPTOKEN }}' --header "Content-Type: application/json" \
+			curl --header "x-access-token:$accessToken" --header "Content-Type: application/json" \
   				--request PUT \
   				--data '{"assigned":"false"}' \
   				"$APIENDPOINT/student/$j"
