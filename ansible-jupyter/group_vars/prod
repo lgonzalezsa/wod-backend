@@ -7,6 +7,9 @@ JPHUBTOKEN: 2c0246e2c8564dc6ac7b12c544b25d77
 BASESTDID: 0
 APIENDPOINT: https://hackshackchallenge.hpedev.io/api
 #APIENDPOINT: https://hackshackondemand.hpedev.io/api
+APIUSER: moderator
+APIPWD: CloudSystem$
+
 LDAPDMN: dc=hpedevlab,dc=net
 #
 KIBANAPWD: "72c1dece-b99d-42e7-9442-ff6bedb8e025"

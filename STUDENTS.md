@@ -153,7 +153,7 @@ Last seat for speaker
  
 
 
-976-1050 HPE Ml-KUB 
+976-1050 WKSHP-K8s-ML-Pipeline Building a dynamic Machine Learning pipeline with KubeDirector
 
 [976-995] challenges  Location :  Grenoble 
 
