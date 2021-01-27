@@ -228,6 +228,14 @@ Last seat for speaker
 [1400] Speakers SMES
 
 
+1401-1475 SPIFFE-SPIRE
+
+[1401-1420] challenges  Location :  Grenoble
+
+[1421-1474] workshops Location :  Mougins
+
+[1475] speaker for live sessions
+
 
 1401-1475  SPIFFE SPIRE
 
