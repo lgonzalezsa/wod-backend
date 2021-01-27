@@ -18,8 +18,6 @@ KIBANAPORT: "10022"
 VCENTERAPP: "vcenter-hpedev.etc.fr.comm.hpecorp.net"
 VCENTERADMIN: "root"
 VCENTERPWD: "vmware"
-OVVMSIMU1: "1HPEOneView-DCS_5.20.00-0419927"
-OVVMSIMU2: "2HPEOneView-DCS_5.20.00-0419927"
 # Used by Francois for Redfish notebooks
 REDFISHILO: "16.31.87.207 ilo5"
 # Virtual Machine containing Francois' OpenBMCs simulators
@@ -50,10 +48,10 @@ POSTPORT: "10025"
 #Oneview API Endpoints
 OVVMSIMU1: "1HPEOneView-DCS_5.20.00-0419927"
 OVVMSIMU1IP: "16.31.86.241"
-OVVMSIMU1NAME: "ci-005056948974"
-OVVMSIMU1FQDN: "ci-005056948974.etc.fr.comm.hpecorp.net"
+OVVMSIMU1NAME: "ov11"
+OVVMSIMU1FQDN: "ov11.etc.fr.comm.hpecorp.net"
 OVVMSIMU2: "2HPEOneView-DCS_5.20.00-0419927"
 OVVMSIMU2IP: "16.31.86.244"
-OVVMSIMU1NAME: "ci-005056943671"
-OVVMSIMU1FQDN: "ci-005056943671.etc.fr.comm.hpecorp.net"
+OVVMSIMU2NAME: "ov21"
+OVVMSIMU2FQDN: "ov21.etc.fr.comm.hpecorp.net"
 

@@ -35,10 +35,6 @@ HPEECPCTRLIP: "16.31.84.38"
 HPEECPCTRLNAME: "controller2.etc.fr.comm.hpecorp.net"
 HPEECPGWIP: "16.31.84.37"
 HPEECPGWNAME: "gateway2.hpedevlab.net"
-SSHOBMCBASEPORT: "22000"
-OBMCBASEPORT: "44000"
-ILODLBASEPORT: "45000"
-ILOSYBASEPORT: "46000"
 
 #LDAP Server
 LDAPSRV: "16.31.84.48 ldapsrv1.hpedevlab.net ldapsrv1.etc.fr.comm.hpecorp.net"
