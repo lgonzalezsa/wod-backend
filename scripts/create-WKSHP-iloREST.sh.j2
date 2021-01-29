@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Test if we are launched as jupyter (initial setup) or student (reset during workshop)
-if [ _"$LOGNAME" != _"jupyter" ]; then
+if [ _"$USER" != _"jupyter" ]; then
         script="$stddir/create-globalbmc.shc.x"
 else
         script="{{ SCRIPTDIR }}/create-globalbmc.shc"
