@@ -22,8 +22,10 @@ REDFISHILO: "192.168.10.5 ilo5"
 # Virtual Machine containing Francois' OpenBMCs simulators
 OBMCSIMUIP: "192.168.10.70"
 OBMCSIMUNAME: "openbmcsimulators"
+OBMCSIMUACC: jupyter
 ILOSIMUIP: "192.168.10.69"
 ILOSIMUNAME: "ilo5simulators"
+ILOSIMUACC: jupyter
 SSHOBMCBASEPORT: "22000"
 OBMCBASEPORT: "44000"
 ILODLBASEPORT: "45000"
