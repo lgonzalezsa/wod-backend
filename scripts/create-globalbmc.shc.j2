@@ -24,21 +24,21 @@ FWDPORTRFSY=$(({{ ILOSYBASEPORT }}+$stdid))
 $script
 
 # Copy QEMU base images for this student
-ssh {{ OBMCSIMUACC }}@{{ OBMCSIMUIP }} cp -a $KITPATHVM/flash-palmetto-ssh-student $KITPATHVM/student$stdid-Obmc.mtd
+ssh {{ NOCHECKSSH }} {{ OBMCSIMUACC }}@{{ OBMCSIMUIP }} cp -a $KITPATHVM/flash-palmetto-ssh-student $KITPATHVM/student$stdid-Obmc.mtd
 
-ssh {{ ILOSIMUACC }}@{{ ILOSIMUIP }} cp -a $KITPATH/VMs/RedfishMockups/ilo5 $KITPATH/VMs/RedfishMockups/student$stdid-ilo5
+ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} cp -a $KITPATH/VMs/RedfishMockups/ilo5 $KITPATH/VMs/RedfishMockups/student$stdid-ilo5
 
-ssh {{ ILOSIMUACC }}@{{ ILOSIMUIP }} cp -a $KITPATH/VMs/RedfishMockups/ilo5-Sy480 $KITPATH/VMs/RedfishMockups/student$stdid-ilo5-Sy480
+ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} cp -a $KITPATH/VMs/RedfishMockups/ilo5-Sy480 $KITPATH/VMs/RedfishMockups/student$stdid-ilo5-Sy480
 
 
 # Start Obmc and ilo5 simulators
-ssh {{ OBMCSIMUACC }}@{{ OBMCSIMUIP }} "nohup $KITPATHVM/qemu-system-arm -m 512 -M palmetto-bmc \
+ssh {{ NOCHECKSSH }} {{ OBMCSIMUACC }}@{{ OBMCSIMUIP }} "nohup $KITPATHVM/qemu-system-arm -m 512 -M palmetto-bmc \
         -net nic,macaddr=C0:FF:EE:00:$stdid:01,model=ftgmac100      \
         -net user,id=netdev0,hostfwd=:{{ OBMCSIMUIP }}:${FWDPORTSSH}-:22,hostfwd=::${FWDPORTHTTPS}-:443,hostname=qemu-student$stdid \
         -drive file=$KITPATHVM/student$stdid-Obmc.mtd,format=raw,if=mtd     \
         -nographic > /dev/null 2>&1 &"
 
-ssh {{ ILOSIMUACC }}@{{ ILOSIMUIP }} "cd $KITPATHRF ; source ../bin/activate ; \
+ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} "cd $KITPATHRF ; source ../bin/activate ; \
 nohup python3 redfishMockupServer.py  \
     --ssl \
     --cert $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \
@@ -46,7 +46,7 @@ nohup python3 redfishMockupServer.py  \
     --host {{ ILOSIMUIP }} --port ${FWDPORTRF} \
     -D $KITPATH/VMs/RedfishMockups/student$stdid-ilo5  > /dev/null 2>&1 &"
 
-ssh {{ ILOSIMUACC }}@{{ ILOSIMUIP }} "cd $KITPATHRF ; source ../bin/activate ; \
+ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} "cd $KITPATHRF ; source ../bin/activate ; \
 nohup python3 redfishMockupServer.py  \
     --ssl \
     --cert $KITPATH/VMs/RedfishMockups/FdzSelfSigned.pem  \

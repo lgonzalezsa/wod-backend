@@ -4,8 +4,8 @@
 # associated to the student. 
 
 # Kill a potential qemu process remaining
-ssh {{ OBMCSIMUACC }}@{{ OBMCSIMUIP }} pkill -f qemu-student$stdid
-ssh {{ ILOSIMUACC }}@{{ ILOSIMUIP }} pkill -f student$stdid-ilo5
-ssh {{ ILOSIMUACC }}@{{ ILOSIMUIP }} pkill -f student$stdid-ilo5-Sy480
+ssh {{ NOCHECKSSH }} {{ OBMCSIMUACC }}@{{ OBMCSIMUIP }} pkill -f qemu-student$stdid
+ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} pkill -f student$stdid-ilo5
+ssh {{ NOCHECKSSH }} {{ ILOSIMUACC }}@{{ ILOSIMUIP }} pkill -f student$stdid-ilo5-Sy480
 # do not remove so callers are happy whatever upper result
 exit 0
