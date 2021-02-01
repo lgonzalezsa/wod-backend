@@ -223,6 +223,7 @@
         - test-action.sh
         - cleanup-users.sh
         - functions.sh
+        - get-cloudvol-token.shc
 
     - name: Enable postfix service
       become: yes
