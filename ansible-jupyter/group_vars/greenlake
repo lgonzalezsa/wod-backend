@@ -1,0 +1,67 @@
+PBKDIR: greenlake
+JPHOST: jupyterhub4.etc.fr.comm.hpecorp.net
+JPIP: 172.17.70.5
+JPHOSTEXT: notebooks4.hpedev.io
+JPHUBAPISRV: http://{{ JPHOST }}:8000
+JPHUBTOKEN: 7921ee68ad464e438483f5ebd1358afe
+BASESTDID: 0
+APIENDPOINT: https://hackshackondemand.hpedev.io/api
+APIUSER: moderator
+APIPWD: CloudSystem$
+LDAPDMN: dc=hpedevlab,dc=net
+#
+KIBANAPWD: "72c1dece-b99d-42e7-9442-ff6bedb8e025"
+KIBANAPORT: "10022"
+#
+VCENTERAPP: "esx-sta-vcenter.etc.fr.comm.hpecorp.net"
+VCENTERADMIN: "root"
+VCENTERPWD: "vmware"
+#
+# Used by Francois for Redfish notebooks
+REDFISHILO: "16.31.87.100 ilo5"
+# Virtual Machine containing Francois' OpenBMCs simulators
+OBMCSIMUIP: "16.31.86.77"
+OBMCSIMUNAME: "openbmcsimulators"
+OBMCSIMUACC: jupyter
+ILOSIMUIP: "16.31.86.81"
+ILOSIMUNAME: "ilo5simulators"
+ILOSIMUACC: jupyter
+SSHOBMCBASEPORT: "22000"
+OBMCBASEPORT: "44000"
+ILODLBASEPORT: "45000"
+ILOSYBASEPORT: "46000"
+
+#
+HPEECPCTRL: "16.31.84.38 controller2 controller2.hpedevlab.net controller2.etc.fr.comm.hpecorp.net"
+HPEECPCTRLIP: "16.31.84.38"
+HPEECPCTRLNAME: "controller2.etc.fr.comm.hpecorp.net"
+HPEECPGWIP: "16.31.84.37"
+HPEECPGWNAME: "gateway2.hpedevlab.net"
+
+#LDAP Server
+LDAPSRV: "16.31.84.48 ldapsrv1.hpedevlab.net ldapsrv1.etc.fr.comm.hpecorp.net"
+LDAPPWD: "CloudSystem$"
+LDAPPORT: "389"
+
+# Postfix Port
+POSTPORT: "10027"
+
+#Oneview API Endpoints
+OVVMSIMU1: "STA1-HPEOneView-DCS_5.40"
+OVVMSIMU1IP: "16.31.86.247"
+OVVMSIMU1NAME: "ov31"
+OVVMSIMU1FQDN: "ov31.etc.fr.comm.hpecorp.net"
+OVVMSIMU2: "STA2-HPEOneView-DCS_5.40"
+OVVMSIMU2IP: "16.31.86.78"
+OVVMSIMU2NAME: "ov41"
+OVVMSIMU2FQDN: "ov41.etc.fr.comm.hpecorp.net"
+OVVMSIMU3: "STA3-HPEOneView-DCS_5.40"
+OVVMSIMU3IP: "16.31.86.62"
+OVVMSIMU3NAME: "ov52"
+OVVMSIMU3FQDN: "ov52.etc.fr.comm.hpecorp.net"
+OVVMSIMU4: "STA4-HPEOneView-DCS_5.40"
+OVVMSIMU4IP: "16.31.86.65"
+OVVMSIMU4NAME: "ov62"
+OVVMSIMU4FQDN: "ov62.etc.fr.comm.hpecorp.net"
+
+

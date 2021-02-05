@@ -8,6 +8,9 @@ jupyterhubtest2.etc.fr.comm.hpecorp.net
 [staging]
 jupyterhub3.etc.fr.comm.hpecorp.net
 
+[greenlake]
+jupyterhub4.etc.fr.comm.hpecorp.net
+
 [prod]
 jupyterhub.etc.fr.comm.hpecorp.net
 
