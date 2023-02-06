@@ -231,12 +231,11 @@ Last seat for speaker
 [1326] Speakers SMES
 
 
+1337-1350 DataVisu101
 
-1337-1347 Aruba-???
+[1337-1350] workshops Location :  Mougins
 
-[1337-1347] workshops Location :  Mougins 
-
-[1337] Speakers SMES
+[1350] Speakers SMES
 
 
 
