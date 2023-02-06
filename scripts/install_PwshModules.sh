@@ -1,4 +1,4 @@
-#!/usr/bin/pwsh
+#!/usr/local/bin/pwsh
 #
 # This script will install all required Powershell modules for the jupyter notebooks run
 #
