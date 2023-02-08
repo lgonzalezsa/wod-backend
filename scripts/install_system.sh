@@ -1,16 +1,10 @@
 #!/bin/bash
 
-set -e
-
-# redirect stdout/stderr to a file
-mkdir -p $HOME/.mail
-exec &> >(tee $HOME/.mail/install.log)
-
 date
 
 export WODTYPE=$1
 if [ -z "$WODTYPE" ]; then
-	echo "Syntax: install_system api-db|backend|frontend"
+	echo "Syntax: install_system api-db|backend|frontend|appliance"
 	exit -1
 fi
 
@@ -99,12 +93,7 @@ source $SCRIPTDIR/wod.sh
 
 cd $SCRIPTDIR/../ansible
 SHORTNAME="`hostname -s`"
-FULLNAME=`ansible-inventory -i inventory --list | jq -r '._meta.hostvars | to_entries[] | .key' | grep -E "^$SHORTNAME(\.|$)"`
-if [ _"$FULLNAME" = _"" ]; then
-        echo "This machine is not a $WODTYPE machine, defined in the ansible inventory so can't be installed"
-        exit -1
-fi
-PBKDIR=`ansible-inventory -i inventory --list | jq -r "._meta.hostvars | to_entries[] | select(.key == \"$FULLNAME\") | .value.PBKDIR"`
+PBKDIR=$WODGROUP
 
 # Declares shell variables as ansible variables as well
 # then they can be used in playbooks
@@ -116,10 +105,6 @@ export ANSPLAYOPT="$ANSPLAYOPT"
 EOF
 export ANSPLAYOPT
 
-WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
-# Another way using ansible
-#DISTRIB=`ansible -m gather_facts -i inventory $FULLNAME | perl -p -e "s/$FULLNAME \| SUCCESS => //" | jq -r ".ansible_facts | .ansible_distribution"`
-#DVER=`ansible -m gather_facts -i inventory $FULLNAME | perl -p -e "s/$FULLNAME \| SUCCESS => //" | jq -r ".ansible_facts | .ansible_distribution_major_version"`
 if ! command -v ansible-galaxy &> /dev/null
 then
     echo "ansible-galaxy could not be found, please install ansible"
@@ -161,8 +146,10 @@ elif [ $WODTYPE = "api-db" ] || [ $WODTYPE = "frontend" ]; then
 	ANSPLAYOPT="$ANSPLAYOPT -e LDAPSETUP=0"
 fi
 
-# Automatic Installation script for the system 
-ansible-playbook -i inventory $WODPRIVINV --limit $PBKDIR $ANSPLAYOPT $ANSPRIVOPT install_$WODTYPE.yml
+if [ $WODTYPE != "appliance" ]; then
+	# Automatic Installation script for the system 
+	ansible-playbook -i inventory $WODPRIVINV --limit $PBKDIR $ANSPLAYOPT $ANSPRIVOPT install_$WODTYPE.yml
+fi
 
 if [ $WODTYPE = "api-db" ]; then
 	cd $WODAPIDBDIR
@@ -209,7 +196,9 @@ elif [ $WODTYPE = "frontend" ]; then
 	npm start &
 fi
 
-cd $SCRIPTDIR/../ansible
+if [ $WODTYPE != "appliance" ]; then
+	cd $SCRIPTDIR/../ansible
 
-ansible-playbook -i inventory $WODPRIVINV --limit $PBKDIR $ANSPLAYOPT $ANSPRIVOPT check_$WODTYPE.yml
+	ansible-playbook -i inventory $WODPRIVINV --limit $PBKDIR $ANSPLAYOPT $ANSPRIVOPT check_$WODTYPE.yml
+fi
 date

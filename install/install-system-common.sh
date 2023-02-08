@@ -45,7 +45,7 @@ clean_clone_log() {
 		(cd $NREPODIR ; git checkout $BRANCH)
 
 		# Store commit Ids for these repos
-		(cd $NREPODIR ; echo "$NREPODIR: `git show --oneline | awk '{print $1}'`")
+		(cd $NREPODIR ; echo "$NREPODIR: `git show --oneline | head -1 | awk '{print $1}'`")
 }
 
 # This is run as WODUSER user
@@ -70,8 +70,9 @@ ssh-keygen -t rsa -b 4096 -N '' -f $HOME/.ssh/id_rsa
 install -m 0600 wod-backend/skel/.ssh/authorized_keys .ssh/
 cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
 
-# Setup this using the group for WoD
-cat > $HOME/wod-backend/ansible/group_vars/$WODGROUP << EOF
+if [ $WODTYPE = "backend" ]; then
+	# Setup this using the group for WoD
+	cat > $HOME/wod-backend/ansible/group_vars/$WODGROUP << EOF
 PBKDIR: $WODGROUP
 # 
 # Installation specific values
@@ -84,10 +85,11 @@ WODFEFQDN: $WODFEFQDN
 WODAPIDBFQDN: $WODAPIDBFQDN
 WODDISTRIB: $WODDISTRIB
 EOF
+	cat $HOME/wod-backend/ansible/group_vars/wod-system >> $HOME/wod-backend/ansible/group_vars/$WODGROUP
 
-cat $HOME/wod-backend/ansible/group_vars/wod-system >> $HOME/wod-backend/ansible/group_vars/$WODGROUP
-if [ -f $HOME/wod-backend/ansible/group_vars/wod-$WODTYPE ]; then
-	cat $HOME/wod-backend/ansible/group_vars/wod-$WODTYPE >> $HOME/wod-backend/ansible/group_vars/$WODGROUP
+	if [ -f $HOME/wod-backend/ansible/group_vars/wod-$WODTYPE ]; then
+		cat $HOME/wod-backend/ansible/group_vars/wod-$WODTYPE >> $HOME/wod-backend/ansible/group_vars/$WODGROUP
+	fi
 fi
 
 # Inventory based on the installed system
@@ -107,6 +109,7 @@ elif [ $WODTYPE = "frontend" ]; then
 $WODFEFQDN ansible_connection=local
 EOF
 fi
+
 if [ $WODTYPE = "api-db" ] ||  [ $WODTYPE = "frontend" ]; then
 	cd wod-$WODTYPE
 	npm install

@@ -9,7 +9,7 @@ usage() {
 	echo " "
 	echo "where:"
 	echo "type      is the installation type"
-	echo "          example: backend, frontend or api-db"
+	echo "          valid values: appliance, backend, frontend or api-db"
 	echo "          if empty using 'backend'                "
 	echo "groupname is the ansible group_vars name to be used"
 	echo "          example: production, staging, test, ...  "
@@ -49,11 +49,11 @@ while getopts "t:f:e:b:a:g:u:s:h" option; do
     case "${option}" in
         t)
             t=${OPTARG}
-            if [ ${t} !=  "backend" ] && [ ${t} != "frontend" ] && [ ${t} != "api-db" ]; then
-		echo "wrong type: ${t}"
-		usage
-		exit -1
-	    fi
+            if [ ${t} !=  "backend" ] && [ ${t} != "frontend" ] && [ ${t} != "api-db" ] && [ ${t} != "appliance" ]; then
+				echo "wrong type: ${t}"
+				usage
+				exit -1
+	    	fi
             ;;
         f)
             f=${OPTARG}
@@ -132,17 +132,26 @@ else
 fi
 export WODGROUP WODFEFQDN WODBEFQDN WODAPIDBFQDN WODBEEXTFQDN WODTYPE
 export WODBEIP=`ping -c 1 $WODBEFQDN 2>/dev/null | grep PING | grep $WODBEFQDN | cut -d'(' -f2 | cut -d')' -f1`
-export WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
+WODDISTRIB=`grep -E '^ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`-`grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | sed 's/"//g'`
+res=`echo $WODDISTRIB | { grep -i rocky || true; }`
+if [ _"$res" != _"" ]; then
+	# remove subver
+	export WODDISTRIB=`echo $WODDISTRIB | cut -d. -f1`
+else
+	export WODDISTRIB
+fi
 echo "WODUSER: $WODUSER" > /etc/wod.yml
 echo "WODSENDER: $WODSENDER" >> /etc/wod.yml
 
 echo "Installing a Workshop on Demand $WODTYPE environment"
-echo "Using frontend $WODFEFQDN"
 echo "Using api-db $WODAPIDBFQDN"
 echo "Using backend $WODBEFQDN ($WODBEIP)"
-echo "Using external backend $WODBEEXTFQDN"
 echo "Using groupname $WODGROUP"
 echo "Using WoD user $WODUSER"
+if [ ${t} != "appliance" ]; then
+	echo "Using frontend $WODFEFQDN"
+	echo "Using external backend $WODBEEXTFQDN"
+fi
 
 # Needs to be root
 if [ _"$SUDO_USER" = _"" ]; then
@@ -203,11 +212,10 @@ chown $WODUSER /etc/wod.yml
 echo "Installing $WODDISTRIB specificities for $WODTYPE"
 $EXEPATH/install-system-$WODDISTRIB.sh
 
-
 # Now drop priviledges
 # Call the common install script to finish install
 echo "Installing common remaining stuff as $WODUSER"
-if [ $WODDISTRIB = "centos-7" ]; then
+if [ $WODDISTRIB = "centos-7" ] || [ $WODDISTRIB = "rocky-8" ] ; then
 	# that su version doesn't support option -w turning around
 	cat > /tmp/wodexports << EOF
 export WODGROUP="$WODGROUP"

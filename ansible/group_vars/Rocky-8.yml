@@ -1,5 +1,5 @@
-# CentOS 7 needs that
+# Rocky 8 needs that
 virtualenv_command: "virtualenv-3"
 virtualenv_python: "python3"
 python_lib: lib/python3.6/site-packages
-mslib: share
+mslib: lib64

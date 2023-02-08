@@ -55,10 +55,28 @@
     package:
       pkg:
       - vim
-      - ntp
       - rsync
       - unzip
       - git
+
+  - name: Ensure all required Ubuntu/CentOS7 packages are installed
+    become: yes
+    become_user: root
+    package:
+      pkg:
+      - ntp
+    when:
+      - ansible_distribution == "CentOS" or ansible_distribution == "Ubuntu"
+
+  - name: Ensure all required Rocky packages are installed
+    become: yes
+    become_user: root
+    package:
+      pkg:
+      - chrony
+      - epel-release
+    when:
+      - ansible_distribution == "Rocky"
 
   - name: Configure LDAP client 1/3
     become: yes

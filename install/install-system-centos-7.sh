@@ -12,15 +12,23 @@ if grep -qv 'ip_resolve=4' /etc/yum.conf; then
 	echo "ip_resolve=4" >> /etc/yum.conf
 fi
 
+PKGLIST="epel-release ansible openssh-server"
+
+if [ $WODTYPE != "appliance" ]; then
+	PKGLIST="$PKGLIST git jq npm"
+fi
+
 # Base packages required
-yum -y install epel-release ansible git openssh-server jq npm
+yum -y install $PKGLIST
 # yarn is needed for server TBChecked requires an additional repo
 
-# Additional repo for up to date git
-if rpm -q --quiet endpoint-repo; then
-	# Do nothing
-	echo ""
-else
-	yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm
+if [ $WODTYPE != "appliance" ]; then
+	# Additional repo for up to date git
+	if rpm -q --quiet endpoint-repo; then
+		# Do nothing
+		echo ""
+	else
+		yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm
+	fi
+	yum -y update git
 fi
-yum -y update git

@@ -4,35 +4,49 @@ use strict;
 use Getopt::Long;
 
 sub usage {
-	print "Syntax: build-vagrant.pl [-t (backend|frontend|api-db|appliance)][-w WKSHP-Name]\n";
+	print "Syntax: build-vagrant.pl [-t (backend|frontend|api-db|appliance)][-w WKSHP-Name][-m key=value]\n";
 	print "\n";
 	print "where you can give the type of wod system to build with the -t option\n";
-	print "not specifying the option launch the build for all the 3 systems sequentially\n";
+	print "(not specifying the option launch the build for all the 3 systems sequentially)\n";
+	print "\n";
+	print "If deploying an appliance, please specify the Workshop Name you're deploying for with -w\n";
+	print "\n";
+	print "If you want to use specific machine names, please specify the them with -m\n";
+	print "Example: -m backend=wodbec8\n";
 	exit(-1);
 }
 
 my $wodtype = undef;
 my $wkshp = "";
+my $woduser = "wodadmin";
 my $help;
+# Automate Wod systems creation
+my %machines = (
+	'api-db' => "wodapiu2204",
+	'frontend' => "wodfeu2204",
+	'backend' => "wodbec7",
+);
+my $machines = \%machines;
 GetOptions("type|t=s" => \$wodtype,
 	   "workshop|w" => \$wkshp,
+	   "machines|m=s%" => $machines,
 	   "help|h" => \$help,
 );
 
-usage() if ($help || defined $ARGV[0] || (not defined $wodtype)); 
+usage() if ($help || defined $ARGV[0]); 
 
-# Automate Wod systems creation
-my %machines = (
-	'api-db' => "wod-api-ubuntu-20.04",
-	'frontend' => "wod-fe-ubuntu-20.04",
-	'backend' => "wodbec7",
-	'appliance' => "wod-$wkshp-centos-7",
-);
 
-if (($wodtype =~ /appliance/) && ((not defined $wkshp) || ($wkshp !~ /^WKSHP-/))) {
-	print "missing or incorrect workshop name - should be WKSHP-Name\n";
+if ((defined $wodtype) && ($wodtype =~ /appliance/) && ((not defined $wkshp) || ($wkshp !~ /^WKSHP-/))) {
+	print "Missing or incorrect workshop name - should be WKSHP-Name\n";
 	usage();
 }
+
+if ((defined $wodtype) && ($wodtype =~ /appliance/)) {
+	# Remove WKSHP prefix
+	$wkshp =~ s/^WKSHP-//;
+	$machines{'appliance'} = "wodapp".$wkshp;
+}
+
 # Manages the private network for machines and DHCP/DNS setup
 my $wodnet = `sudo virsh net-list --name`;
 if ($wodnet =~ /^wodnet$/) {
@@ -49,14 +63,17 @@ if (not defined $wodtype) {
 
 my $h = \%machines;
 foreach my $m (@mtypes) {
+	print "Stopping vagrant machine $h->{$m}\n";
 	system("vagrant halt $h->{$m}");
+	print "Starting vagrant machine $h->{$m}\n";
 	system("vagrant up $h->{$m}");
+	print "Installing vagrant machine $h->{$m}\n";
 	if ($wodtype =~ /appliance/) {
-		# We need to find who is the WODUSER to use it
-		my $WODUSER=`vagrant ssh  $h->{'backend'} -c grep -Ev 'WODUSER' /etc/wod.yml | cut -d: -f2`;
-		my $cmd = "sudo su - $WODUSER -c \"./wod-backend/scripts/setup-appliance $wkshp\"";
-		system("vagrant ssh $h->{'backend'} -c \"sudo su - $WODUSER -c $cmd\"");
-	} else {
-		system("vagrant ssh $h->{$m} -c \"sudo /vagrant/install.sh -t $m -g production -b wodbec7 -f wod-fe-ubuntu-20.04 -a wod-api-ubuntu-20.04\"");
+		system("vagrant ssh $h->{$m} -c \"sudo /vagrant/install.sh -t $m\"");
+		print "Setting up vagrant appliance $h->{$m}\n";
+		my $cmd = "\"./wod-backend/scripts/setup-appliance $wkshp\"";
+		system("vagrant ssh $h->{'backend'} -c \"sudo su - $woduser -c $cmd\"");
+	} elsif ($wodtype =~ /backend/) {
+		system("vagrant ssh $h->{$m} -c \"sudo /vagrant/install.sh -t $m -g production -b $machines{'backend'} -f $machines{'frontend'} -a $machines{'api-db'} -e localhost -u $woduser -s wod\@flossita.org\"");
 	}
 }
