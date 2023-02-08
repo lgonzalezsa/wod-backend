@@ -54,16 +54,6 @@
         file: "{{ VARPRIVDIR }}/variables_{{ CHALLENGE }}.yml"
       when: privvariables_file.stat.exists
 
-    - name: check GreenLake API CLient variables file exists
-      stat:
-        path: "{{ ansible_env.HOME }}/tmp/ac-student{{ STDID }}.yml"
-      ignore_errors: true
-      register: greenlake_api_client_file
-
-    - include_vars:
-        file: "{{ ansible_env.HOME }}/tmp/ac-student{{ STDID }}.yml"
-      when: greenlake_api_client_file.stat.exists
-
     - name: check password file exists
       stat:
         path: "{{ VARPRIVDIR }}/pass/variables_{{ CHALLENGE }}_{{ STDID }}.yml"
@@ -172,6 +162,7 @@
       failed_when: false
       changed_when: false
 
+    # First copy for all data except what has to be templated done below
     - name: Synchronize target students with Notebooks Workshop content
       ansible.posix.synchronize:
         src: "{{ WODNOBO }}/{{ DIR }}/{{ WORKSHOP }}/"
@@ -197,10 +188,20 @@
         - nobopriv_path.rc == 0
         - nobo_path.rc != 0
 
+    - name: check a private pre_templating.yml file exists
+      stat:
+        path: "{{ ANSIBLEPRIVDIR }}/pre_templating.yml"
+      ignore_errors: true
+      register: pretemp
+
+    - include_tasks: "{{ ANSIBLEPRIVDIR }}/pre_templating.yml"
+      when: pretemp.stat.exists
+ 
       #- name: debug
       #debug:
       #msg: "PASSSTU:{{ PASSSTU }}"
-
+ 
+    # Second copy all data to be templated with variables
     - name: Deliver notebooks as ansible template for variable expansion
       template:
         src: "{{ item.path }}"
@@ -217,6 +218,15 @@
       when:
         - nobopriv_path.rc == 0
         - nobo_path.rc != 0
+
+    - name: check a private post_templating.yml file exists
+      stat:
+        path: "{{ ANSIBLEPRIVDIR }}/post_templating.yml"
+      ignore_errors: true
+      register: posttemp
+
+    - include_tasks: "{{ ANSIBLEPRIVDIR }}/post_templating.yml"
+      when: posttemp.stat.exists
 
     - name: Create a checkpoint directory
       file:
