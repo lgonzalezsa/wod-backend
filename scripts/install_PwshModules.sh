@@ -26,7 +26,7 @@ Install-Module -Name HPEOneView.540
 Install-Module -Name HPEOneView.550
 
 echo "Make these modules accessible for all users"
-mv $HOME/.local/share/powershell/Modules/* /opt/microsoft/powershell/Modules/7/
+mv $HOME/.local/share/powershell/Modules/* /opt/microsoft/powershell/7/Modules/
 
 echo "install vmware powercli"
 Install-Module -Name VMware.PowerCLI
