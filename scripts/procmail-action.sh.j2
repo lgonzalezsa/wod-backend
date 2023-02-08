@@ -143,7 +143,7 @@ if [ $action != "RESET" ]; then
 				{{ SCRIPTPRIVDIR }}/create-$ws.sh
 			fi
 			echo "Copying workshop $w content into target student dir $stddir"
-			ansible-playbook {{ ANSIBLEDIR }}/copy_folder.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" $ANSPLAYOPT $ANSPRIVOPT --vault-password-file {{ ANSIBLEDIR }}/vault_secret
+			ansible-playbook {{ ANSIBLEDIR }}/copy_folder.yml -i {{ ANSIBLEDIR }}/inventory $WODPRIVINV --limit {{ PBKDIR }} -e "MODEWS=$MODEWS DIR=  CHALLENGE=$w WORKSHOP=$ws STDID=$stdid" $ANSPLAYOPT $ANSPRIVOPT --vault-password-file {{ ANSIBLEPRIVDIR }}/vault_secret
 			if [ -x "{{ SCRIPTDIR }}/post-copy-$ws.sh" ]; then
 				echo "Perform post actions for workshop $w"
 				{{ SCRIPTDIR }}/post-copy-$ws.sh

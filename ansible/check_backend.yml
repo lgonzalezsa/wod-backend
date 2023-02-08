@@ -200,15 +200,15 @@
         group: "{{ WODUSER }}"
         mode: 0750
 
-    - name: Ensure that file vault_secret in {{ ANSIBLEDIR }}/ exists
+    - name: Ensure that file vault_secret in {{ ANSIBLEPRIVDIR }}/ exists
       lineinfile:
-        path: "{{ ANSIBLEDIR }}/vault_secret"
-        regexp: '^{{ VAULTPWD }}$'
+        path: "{{ ANSIBLEPRIVDIR }}/vault_secret"
+        regexp: '^.*$'
         line: '{{ VAULTPWD }}'
 
     - name: Fix modes for {{ ANSIBLEDIR }}/vault_secret
       file:
-        path: "{{ ANSIBLEDIR }}/vault_secret"
+        path: "{{ ANSIBLEPRIVDIR }}/vault_secret"
         mode: 0600
 
     - name: Ensure that required nbconvert directories exists

@@ -134,11 +134,8 @@ create_var_passwd() {
 	if [ ! -d "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass" ]; then
 		mkdir -p "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass"
 	fi
-	if [ -f {{ ANSIBLEPRIVDIR }}//vault_secret ]; then
-		ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEPRIVDIR }}/vault_secret" $randompw --name "'PASSSTU'" > "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
-	else
-		ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEDIR }}/vault_secret" $randompw --name "'PASSSTU'" > "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
-	fi
+	# It's now mandatory that vault_secret is located in the private part
+	ansible-vault encrypt_string --vault-password-file "{{ ANSIBLEPRIVDIR }}/vault_secret" $randompw --name "'PASSSTU'" > "{{ ANSIBLEDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml"
 }
 
 # This function retuns the workshop name from the mail body
