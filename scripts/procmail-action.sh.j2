@@ -153,7 +153,7 @@ if [ $action != "RESET" ]; then
 				{{ SCRIPTPRIVDIR }}/post-copy-$ws.sh
 			fi
 			# $w on purpose as stdid is unique, so name is not important
-			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml {{ ANSIBLEDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml
+			rm -f {{ ansible_env.HOME }}/tmp/ac-student$stdid.yml {{ ANSIBLEPRIVDIR }}/{{ PBKDIR }}/pass/variables_${w}_${stdid}.yml
 		fi
 
 		# Increment the student ID by Number of jupyterhub students in students table

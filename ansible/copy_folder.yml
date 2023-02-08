@@ -26,15 +26,7 @@
     - name: Load variables generated at install time
       include_vars: /etc/wod.yml
 
-    - name: check VARDIR exists
-      file:
-        path: "{{ VARDIR }}/pass"
-        state: directory
-        owner: "{{ WODUSER }}"
-        group: "{{ WODUSER }}"
-        mode: 0751
-
-    - name: check VARPRIVDIR exists
+    - name: "check {{ VARPRIVDIR }}/pass exists"
       file:
         path: "{{ VARPRIVDIR }}/pass"
         state: directory
@@ -74,12 +66,12 @@
 
     - name: check password file exists
       stat:
-        path: "{{ VARDIR }}/pass/variables_{{ CHALLENGE }}_{{ STDID }}.yml"
+        path: "{{ VARPRIVDIR }}/pass/variables_{{ CHALLENGE }}_{{ STDID }}.yml"
       ignore_errors: true
       register: pass_file
 
     - include_vars:
-        file: "{{ VARDIR }}/pass/variables_{{ CHALLENGE }}_{{ STDID }}.yml"
+        file: "{{ VARPRIVDIR }}/pass/variables_{{ CHALLENGE }}_{{ STDID }}.yml"
       when: pass_file.stat.exists
 
     # find all notebooks
