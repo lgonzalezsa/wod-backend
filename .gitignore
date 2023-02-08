@@ -9,6 +9,7 @@ scripts/create-*.sh
 scripts/cleanup-*.sh
 scripts/setup-*.sh
 scripts/post-*.sh
+scripts/build*.sh
 scripts/*.shc
 scripts/*.x
 scripts/*.x.c
