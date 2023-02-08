@@ -139,7 +139,7 @@
       become: yes
       become_user: root
       package:
-        pkg:
+        name:
         - packages-microsoft-prod
         state: absent
 
@@ -174,7 +174,7 @@
       become: yes
       become_user: root
       package:
-        pkg:
+        name:
         - kubectl
         - aspnetcore-runtime-3.1
         - aspnetcore-runtime-5.0
@@ -189,7 +189,7 @@
       become: yes
       become_user: root
       package:
-        pkg:
+        name:
         - ansible
         - python3
         - python3-pip
