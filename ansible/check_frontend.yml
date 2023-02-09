@@ -31,8 +31,7 @@
         - "80"
         - "443"
       when:
-        - ansible_distribution == "CentOS"
-        - ansible_distribution_major_version >= "7"
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
     - name: Install frontend utility scripts
       become: yes

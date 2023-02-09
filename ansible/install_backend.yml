@@ -21,6 +21,17 @@
         - ansible_distribution == "CentOS"
         - ansible_distribution_major_version >= "7"
 
+    - name: Enable Powertools repo for Rocky 
+      become: yes
+      become_user: root
+      lineinfile:
+        path: "/etc/yum.repos.d/Rocky-PowerTools.repo"
+        line: 'enabled=1'
+        state: present
+      when:
+        - ansible_distribution == "Rocky"
+        - ansible_distribution_major_version >= "8"
+
     - name: Add conda GPG Key to APT
       become: yes
       become_user: root
@@ -69,7 +80,7 @@
         key: https://rpm.releases.hashicorp.com/gpg
         state: present
       when:
-        - ansible_distribution == "CentOS"
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
     - name: Add Hashicorp YUM repository
       become: yes
@@ -81,7 +92,7 @@
         enabled: yes
         state: present
       when:
-        - ansible_distribution == "CentOS"
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
     - name: Add K8s GPG Key to APT
       become: yes
@@ -102,7 +113,7 @@
         - https://packages.cloud.google.com/yum/doc/yum-key.gpg
         - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
       when:
-        - ansible_distribution == "CentOS"
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
     - name: Add K8s APT repository
       become: yes
@@ -119,12 +130,12 @@
       become_user: root
       yum_repository:
         name: k8s
-        baseurl: "https://packages.cloud.google.com/yum/repos/kubernetes-el{{ ansible_distribution_major_version }}-$basearch"
+        baseurl: "https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch"
         description: "Upstream K8s Yum repository"
         enabled: yes
         state: present
       when:
-        - ansible_distribution == "CentOS"
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
     - name: Remove Microsoft repo file just in case
       become: yes
@@ -143,6 +154,15 @@
         - packages-microsoft-prod
         state: absent
 
+    - name: Add Microsoft GPG Key to RPM DB
+      become: yes
+      become_user: root
+      rpm_key:
+        key: "https://packages.microsoft.com/keys/microsoft.asc"
+        state: present
+      when:
+        - ansible_distribution == "Rocky"
+
     - name: Setup MicroSoft repo for APT
       become: yes
       become_user: root
@@ -159,7 +179,7 @@
         name: "https://packages.microsoft.com/config/rhel/{{ ansible_distribution_major_version }}/packages-microsoft-prod.rpm"
         state: present
       when:
-        - ansible_distribution == "CentOS"
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
     - name: Update apt cache
       become: yes
@@ -214,9 +234,6 @@
         - cmake
         - golang
         - texlive-xetex
-        - aspnetcore-runtime-3.1
-        - dotnet-runtime-3.1
-        - dotnet-sdk-3.1
         - aspnetcore-runtime-6.0
         - dotnet-runtime-6.0
         - dotnet-sdk-6.0
@@ -237,6 +254,7 @@
         - expect
         - netcat
         - terraform
+        state: present
         update_cache: yes
 
     - name: Ensure all required DEB packages are installed
@@ -269,13 +287,12 @@
     - name: Ensure all required RPM packages are installed
       become: yes
       become_user: root
-      yum:
+      package:
         pkg:
         - python3-devel
         - openldap-clients
         - glibc-devel
         - java
-        - llvm-toolset-7.0-lld
         - nfs-utils
         - zeromq-devel
         - perl-Crypt-PasswdMD5
@@ -284,9 +301,18 @@
         - perl-Proc-ProcessTable
         - perl-Data-Dumper
         - psacct
+        state: present
+      when:
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
+
+    - name: Ensure all required CentOS RPM packages are installed
+      become: yes
+      become_user: root
+      yum:
+        name: llvm-toolset-7.0-lld
+        state: present
       when:
         - ansible_distribution == "CentOS"
-        - ansible_distribution_major_version >= "7"
 
     - name: Ensure all required node.js packages are installed
       become: yes
@@ -347,8 +373,7 @@
         virtualenv_command: "{{ virtualenv_command }}"
         virtualenv_python: "{{ virtualenv_python }}"
       when:
-        - ansible_distribution == "CentOS"
-        - ansible_distribution_major_version >= "7"
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
     - name: Ensure all required pip packages are installed
       pip:
@@ -507,16 +532,16 @@
         path: '{{ ansible_env.HOME }}/.local/share/jupyter/kernels'
         state: absent
 
-    - name: Ensure powershell is removed through dotnet  before installing
+    - name: Ensure powershell is removed through dotnet before installing
       become: yes
       become_user: root
-      command: /usr/share/dotnet/dotnet tool uninstall --global powershell
+      command: /usr/{{ mslib }}/dotnet/dotnet tool uninstall --global powershell
       ignore_errors: yes
 
     - name: Ensure dotnet interactive is removed through dotnet before installing
       become: yes
       become_user: root
-      command: /usr/share/dotnet/dotnet tool uninstall --global Microsoft.dotnet-interactive
+      command: /usr/{{ mslib }}/dotnet/dotnet tool uninstall --global Microsoft.dotnet-interactive
       ignore_errors: yes
 
     - name: Remove old MS tools to be sure a good one will be available
@@ -538,12 +563,12 @@
         path: /usr/local/bin/.store
         state: absent
 
-    # Incorrect CentOS v6 package vs Ubuntu which provides /usr/bin/dotnet
+    # Incorrect CentOS v7 package vs Ubuntu which provides /usr/bin/dotnet
     - name: Ensure dotnet link is correct if needed
       become: yes
       become_user: root
       file:
-        src: /usr/share/dotnet/dotnet
+        src: /usr/{{ mslib }}/dotnet/dotnet
         dest: /usr/local/bin/dotnet
         state: link
         owner: "{{ WODUSER }}"
@@ -551,18 +576,17 @@
         mode: 0755
         force: yes
       when:
-        - ansible_distribution == "CentOS"
-        - ansible_distribution_major_version >= "7"
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
     - name: Ensure powershell is installed through dotnet
       become: yes
       become_user: root
-      command: /usr/share/dotnet/dotnet tool install --tool-path /usr/local/bin powershell
+      command: /usr/{{ mslib }}/dotnet/dotnet tool install --tool-path /usr/local/bin powershell
 
     - name: Ensure dotnet interactive is installed through dotnet
       become: yes
       become_user: root
-      command: /usr/share/dotnet/dotnet tool install --tool-path /usr/local/bin Microsoft.dotnet-interactive
+      command: /usr/{{ mslib }}/dotnet/dotnet tool install --tool-path /usr/local/bin Microsoft.dotnet-interactive
 
     - name: Ensure dotnet kernel is installed
       become: yes
@@ -779,8 +803,7 @@
         line: 'StrictModes no'
         state: present
       when:
-        - ansible_distribution == "CentOS"
-        - ansible_distribution_major_version == "7"
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
     - name: restart sshd service
       become: yes
@@ -791,8 +814,7 @@
         enabled: yes
         name: sshd
       when:
-        - ansible_distribution == "CentOS"
-        - ansible_distribution_major_version == "7"
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
     - name: Test whether notebooks are already available
       command: ls "{{ WODNOBO }}/README.md"

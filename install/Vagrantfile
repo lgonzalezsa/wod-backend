@@ -14,49 +14,75 @@ Vagrant.configure("2") do |config|
   # boxes at https://vagrantcloud.com/search.
   config.vm.synced_folder './', '/vagrant', type: 'rsync'
   #config.vm.synced_folder './', '/vagrant', type: 'nfs'
-  # Private management network for DHCP naming and adressing
   config.vm.provider :libvirt do |domain|
-    domain.management_network_name = "wodnet"
-    domain.management_network_address = "10.1.0.0/24"
-    domain.management_network_mode = "route"
+    domain.default_prefix = ""
   end
 
-  config.vm.define "wod-be-centos-7" do |wodbecentos7|
-    wodbecentos7.vm.box = "generic/centos7"
-    wodbecentos7.vm.hostname = "wod-be-centos-7.wodnet.local"
-    #wodbecentos7.vm.network  "private_network", ip: "192.168.200.10"
-    wodbecentos7.vm.network "forwarded_port", guest: 8000, host: 8010
+  # Setup your DHCP server on your local LAN so it allocates fixed IP addresses to the VMs
+  # based on their fixed MAC addresses
+  # and setup as well your DNS so names correspond
+  config.vm.define :test do |test|
+    test.vm.box = "generic/centos7"
+    test.vm.hostname = "test.wodnet.local"
+    # The last option is mandatory to have a correct host name
+    test.vm.network :public_network, :mac => "525400010100", :libvirt__domain_name => "test.wodnet.local"
+    test.vm.network :forwarded_port, guest: 8000, host: 8009
   end
-  config.vm.define "wodbec7" do |wodbecentos7|
-    wodbecentos7.vm.box = "generic/centos7"
-    wodbecentos7.vm.hostname = "wodbec7.wodnet.local"
-    #wodbecentos7.vm.network  "private_network", ip: "192.168.200.10"
-    wodbecentos7.vm.network "forwarded_port", guest: 8000, host: 8010
+  config.vm.define :wodbec8 do |wodbec8|
+    wodbec8.vm.box = "generic/rocky8"
+    wodbec8.vm.hostname = "wodbec8.wodnet.local"
+    wodbec8.vm.network :public_network, :mac => "525400010101", :libvirt__domain_name => "wodbec8.wodnet.local"
+    wodbec8.vm.network "forwarded_port", guest: 8000, host: 8009
   end
-  config.vm.define "wod-fe-centos-7" do |wodfecentos7|
-    wodfecentos7.vm.box = "generic/centos7"
-    wodfecentos7.vm.hostname = "wod-fe-centos-7.wodnet.local"
-    #wodfecentos7.vm.network  "private_network", ip: "192.168.200.10"
-    wodfecentos7.vm.network "forwarded_port", guest: 8000, host: 8011
+  config.vm.define :wodbec7 do |wodbec7|
+    wodbec7.vm.box = "generic/centos7"
+    wodbec7.vm.hostname = "wodbec7.wodnet.local"
+    wodbec7.vm.network :public_network, :mac => "525400010104", :libvirt__domain_name => "wodbec7.wodnet.local"
+    wodbec7.vm.network "forwarded_port", guest: 8000, host: 8010
   end
-  config.vm.define "wod-fe-ubuntu-20.04" do |wodfeubuntu2004|
-    wodfeubuntu2004.vm.box = "generic/ubuntu2004"
-    wodfeubuntu2004.vm.hostname = "wod-fe-ubuntu-2004.wodnet.local"
-    #wodfeubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
-    wodfeubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8012
-  end
-  config.vm.define "wod-be-ubuntu-20.04" do |wodbeubuntu2004|
+  config.vm.define :wodbeu2004 do |wodbeubuntu2004|
     wodbeubuntu2004.vm.box = "generic/ubuntu2004"
-    wodbeubuntu2004.vm.hostname = "wod-be-ubuntu-2004.wodnet.local"
-    #wodbeubuntu2004.vm.network  "private_network", ip: "192.168.200.20"
-    wodbeubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8020
+    wodbeubuntu2004.vm.hostname = "wodbeu2004.wodnet.local"
+    wodbeubuntu2004.vm.network :public_network, :mac => "525400010105", :libvirt__domain_name => "wodbeu2004.wodnet.local"
+    wodbeubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8011
   end
-  config.vm.define "wod-api-ubuntu-20.04" do |wodapiubuntu2004|
-    wodapiubuntu2004.vm.box = "generic/ubuntu2004"
-    wodapiubuntu2004.vm.hostname = "wod-api-ubuntu-2004.wodnet.local"
-    wodapiubuntu2004.vm.network "forwarded_port", guest: 8000, host: 8021
+  config.vm.define :wodbeu2204 do |wodbeubuntu2204|
+    wodbeubuntu2204.vm.box = "generic/ubuntu2204"
+    wodbeubuntu2204.vm.hostname = "wodbeu2204.wodnet.local"
+    wodbeubuntu2204.vm.network :public_network, :mac => "525400010106", :libvirt__domain_name => "wodbeu2204.wodnet.local"
+    wodbeubuntu2204.vm.network "forwarded_port", guest: 8000, host: 8012
+    wodbeubuntu2204.vm.provision "shell",
+      # This has to be so until your host system uses an openssh >= 8.8
+      # and your private key is not RSA1 anymore deprecated with it.
+      # located under $HOME/.vagrant.d/insecure_private_key
+      # or replace manually this private key with an ssh-ed25519 one
+      inline: <<-EOS
+      echo 'PubkeyAcceptedKeyTypes=+ssh-rsa' > /etc/ssh/sshd_config.d/wod.conf
+      echo 'PubkeyAcceptedAlgorithms=+ssh-rsa' >> /etc/ssh/sshd_config.d/wod.conf
+      # I also have to modify DNS resolution despite systemd believeing it does it correctly
+      rm -f /etc/resolv.conf
+      echo 'nameserver 192.168.8.2' > /etc/resolv.conf
+      echo 'search home.musique-ancienne.org' >> /etc/resolv.conf
+      EOS
   end
-  #ubuntu2004.vm.provider = "libvirt"
+  config.vm.define :"wodfeu2204" do |wodfeubuntu2204|
+    wodfeubuntu2204.vm.box = "generic/ubuntu2004"
+    wodfeubuntu2204.vm.hostname = "wodfeu2204.wodnet.local"
+    wodfeubuntu2204.vm.network :public_network, :mac => "525400010102", :libvirt__domain_name => "wodfeubuntu2204.wodnet.local"
+    wodfeubuntu2204.vm.network "forwarded_port", guest: 8000, host: 8020
+  end
+  config.vm.define :"wodapiu2204" do |wodapiubuntu2204|
+    wodapiubuntu2204.vm.box = "generic/ubuntu2004"
+    wodapiubuntu2204.vm.hostname = "wodapiu2204.wodnet.local"
+    wodapiubuntu2204.vm.network :public_network, :mac => "525400010103", :libvirt__domain_name => "wodapiubuntu2204.wodnet.local"
+    wodapiubuntu2204.vm.network "forwarded_port", guest: 8000, host: 8021
+  end
+  config.vm.define :wodappDocker101 do |wodappDocker101|
+    wodappDocker101.vm.box = "generic/centos7"
+    wodappDocker101.vm.hostname = "wodappDocker101.wodnet.local"
+    wodappDocker101.vm.network :public_network, :mac => "525400010104", :libvirt__domain_name => "wodappDocker101.wodnet.local"
+    wodappDocker101.vm.network "forwarded_port", guest: 8000, host: 8010
+  end
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs

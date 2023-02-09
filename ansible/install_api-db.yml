@@ -48,7 +48,7 @@
     - name: Ensure all required RPM packages are installed
       become: yes
       become_user: root
-      yum:
+      package:
         pkg:
         - openldap-clients
         - perl-Crypt-PasswdMD5
@@ -57,8 +57,7 @@
         - perl-Data-Dumper
         - psacct
       when:
-        - ansible_distribution == "CentOS"
-        - ansible_distribution_major_version >= "7"
+        - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
     - name: Ensure required directories under /usr/local are owned by "{{ WODUSER }}"
       become: yes
