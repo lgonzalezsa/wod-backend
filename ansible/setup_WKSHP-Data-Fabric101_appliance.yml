@@ -7,10 +7,11 @@
       become: yes
       become_user: root
       package:
-        pkg:
+        name:
         - nfs-utils
         - jq
         - openldap-clients
+        state: present
       when:
         - ansible_distribution == "CentOS"
 

@@ -20,7 +20,7 @@ my @whitelistcmd = (
 		"dotnet",
 		"dotnet-interact",
 );
-my $logf = "$ENV{'HOME'}/.mail/kill-processes.log";
+my $logf = "$ENV{'HOME'}/.mail/wod-kill-processes.log";
 
 # Do not change below
 open(LOG,">> $logf") || die "Unable to create $logf";
@@ -89,7 +89,7 @@ while (1) {
 			}
 			system("sudo pkill -KILL -U $s");
 			# Erase student dir as well
-			system("{{ SCRIPTDIR }}/test-action.sh PURGE VOID $s");
+			system("/usr/local/bin/wod-test-action.sh PURGE VOID $s");
 	}
 	# Do that every timeout value
 	sleep($loop);

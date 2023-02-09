@@ -9,8 +9,8 @@ This project is the back-end part of our Workshop-on-Demand setup. It will setup
 Instructions for installation are in INSTALL.md
 
 
-# deliver
-This command has to be run whenever some changes are made to any .j2 or ansible file. It will update scripts and relevants files related to the platform on which the deliver script is launched.
+# wod-deliver
+This command has to be run whenever some changes are made to any .j2 or ansible variables file. It will update scripts and relevants files related to the platform on which the wod-deliver script is launched.
 
 
 ## Setup Appliances for Workshops:

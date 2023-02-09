@@ -45,11 +45,13 @@ cat >> $SCRIPTDIR/wod.sh << 'EOF'
 # wod-backend (WODBEDIR)
 #    |---------- ansible (ANSIBLEDIR)
 #    |---------- scripts (SCRIPTDIR defined in all.yml not here to allow overloading)
+#    |---------- sys (SYSDIR)
 #    |---------- install
 #    |---------- conf
 #    |---------- skel
 #
 export ANSIBLEDIR=$WODBEDIR/ansible
+export SYSDIR=$WODBEDIR/sys
 
 # PRIVATE PART
 # These 3 dirs have fixed names by default that you can change in this file
@@ -64,6 +66,7 @@ PWODBEDIR=`dirname $WODBEDIR`
 export WODPRIVDIR=$PWODBEDIR/wod-private
 export ANSIBLEPRIVDIR=$WODPRIVDIR/ansible
 export SCRIPTPRIVDIR=$WODPRIVDIR/scripts
+export SYSPRIVDIR=$WODPRIVDIR/sys
 export WODPRIVNOBO=$WODPRIVDIR/notebooks
 WODPRIVINV=""
 # Manages private inventory if any
@@ -97,7 +100,7 @@ PBKDIR=$WODGROUP
 
 # Declares shell variables as ansible variables as well
 # then they can be used in playbooks
-ANSPLAYOPT="-e PBKDIR=$PBKDIR -e WODUSER=$WODUSER -e WODBEDIR=$WODBEDIR -e WODNOBO=$WODNOBO -e WODPRIVNOBO=$WODPRIVNOBO -e WODPRIVDIR=$WODPRIVDIR -e WODAPIDBDIR=$WODAPIDBDIR -e WODFEDIR=$WODFEDIR -e STUDDIR=$STUDDIR -e ANSIBLEDIR=$ANSIBLEDIR -e ANSIBLEPRIVDIR=$ANSIBLEPRIVDIR -e SCRIPTPRIVDIR=$SCRIPTPRIVDIR "
+ANSPLAYOPT="-e PBKDIR=$PBKDIR -e WODUSER=$WODUSER -e WODBEDIR=$WODBEDIR -e WODNOBO=$WODNOBO -e WODPRIVNOBO=$WODPRIVNOBO -e WODPRIVDIR=$WODPRIVDIR -e WODAPIDBDIR=$WODAPIDBDIR -e WODFEDIR=$WODFEDIR -e STUDDIR=$STUDDIR -e ANSIBLEDIR=$ANSIBLEDIR -e ANSIBLEPRIVDIR=$ANSIBLEPRIVDIR -e SCRIPTPRIVDIR=$SCRIPTPRIVDIR -e SYSDIR=$SYSDIR -e SYSPRIVDIR=$SYSPRIVDIR"
 
 # For future wod.sh usage by other scripts
 cat >> $SCRIPTDIR/wod.sh << EOF

@@ -7,8 +7,9 @@
       become: yes
       become_user: root
       package:
-        pkg:
+        name:
         - httpd
+        state: present
 
     - name: Setup firewalld TCP rules
       become: yes

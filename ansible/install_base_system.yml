@@ -6,7 +6,7 @@
     become: yes
     become_user: root
     package:
-      pkg:
+      name:
       - curl
       - gnupg2
       state: present
@@ -53,11 +53,12 @@
     become: yes
     become_user: root
     package:
-      pkg:
+      name:
       - vim
       - rsync
       - unzip
       - git
+      state: present
 
   - name: Ensure all required Ubuntu/CentOS7 packages are installed
     become: yes
@@ -82,7 +83,7 @@
     become: yes
     become_user: root
     template:
-      src: "{{ WODBEDIR }}/ldap.conf.j2"
+      src: "{{ SYSDIR }}/ldap.conf.j2"
       dest: /etc/ldap.conf
       owner: root
       group: root
@@ -145,8 +146,9 @@
     become: yes
     become_user: root
     package:
-      pkg:
+      name:
       - nss-pam-ldapd
+      state: present
     when:
       - ansible_distribution == "CentOS"
       - LDAPSETUP == "1"

@@ -428,12 +428,17 @@
 #      file:
 #        path: '{{ ansible_env.HOME }}/go'
 #        state: absent
+#
+    - name: Ensure that this a compliant WoD system
+      include_tasks: "{{ ANSIBLEDIR }}/check_system.yml"
 
+    # In this part we manage the jupyterhub setup
+    #
     - name: Make kernel_python available under /usr/local/bin
       become: yes
       become_user: root
       copy:
-        src: "{{ SCRIPTDIR }}/kernel_python"
+        src: "{{ SYSDIR }}/kernel_python"
         dest: /usr/local/bin/kernel_python
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
@@ -463,7 +468,7 @@
       with_fileglob: [ '{{ SCRIPTDIR }}//build*.sh.j2' ]
 
     - name: Ensure Rust kernel is installed
-      shell: . '{{ JPHUB }}/bin/activate' && "{{ WODBEDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}" --install
+      shell: . '{{ JPHUB }}/bin/activate' && "{{ SYSDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}" --install
 
     - name: Ensure Rust kernel files are installed
       copy:
@@ -476,7 +481,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ WODBEDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}"
+        src: "{{ SYSDIR }}/evcxr_jupyter.{{ ansible_distribution }}-{{ ansible_distribution_major_version }}"
         dest: "/usr/local/bin/evcxr_jupyter"
         owner: "{{ WODUSER }}"
         group: "{{ WODUSER }}"
@@ -521,7 +526,7 @@
 
     - name: Patch ansible kernel with fixes coming from master
       ansible.posix.patch:
-        src: "{{ WODBEDIR }}/master-vs-0.9.0.patch"
+        src: "{{ SYSDIR }}/master-vs-0.9.0.patch"
         basedir: "{{ JPHUB }}/{{ python_lib }}/ansible_kernel"
         strip: 2
         backup: yes
@@ -612,7 +617,7 @@
       ignore_errors: yes
       with_items:
         - jupyterhub
-        - kill-processes
+        - wod-kill-processes
 
     - name: Remove jupyterhub configuration file
       become: yes
@@ -699,12 +704,6 @@
             ]
           #####################################################################################
    
-    - name: Copy WoD service file as ansible template for variable expansion
-      become: yes
-      become_user: root
-      template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
-      with_fileglob: [ '{{ WODBEDIR }}//*.service.j2' ]
-
     - name: Enable WoD service
       become: yes
       become_user: root
@@ -715,7 +714,6 @@
         name: "{{ item }}"
       with_items:
         - jupyterhub
-        - kill-processes
 
     - name: Wait 5 seconds to let WoD services start
       shell: sleep 5
@@ -759,7 +757,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ WODBEDIR }}/fail2ban.conf"
+        src: "{{ SYSDIR }}/fail2ban.conf"
         dest: "/etc/fail2ban/filter.d/jupyterhub.conf"
         owner: root
         group: root
@@ -769,7 +767,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ WODBEDIR }}/fail2ban.jail"
+        src: "{{ SYSDIR }}/fail2ban.jail"
         dest: "/etc/fail2ban/jail.local"
         owner: root
         group: root
@@ -779,7 +777,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ WODBEDIR }}/fail2ban.action"
+        src: "{{ SYSDIR }}/fail2ban.action"
         dest: "/etc/fail2ban/action.d/jupyterhub.conf"
         owner: root
         group: root
@@ -795,7 +793,7 @@
         name: fail2ban
 
     # On CentOS 7 we need to remove strict mode for sshd to work with our conf (mode 770 needed for user home dirs)
-    - name: Fix sshd conf on CentOS
+    - name: Fix sshd conf on CentOS/Rocky
       become: yes
       become_user: root
       lineinfile:
