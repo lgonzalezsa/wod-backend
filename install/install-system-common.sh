@@ -118,4 +118,4 @@ fi
 # Change default passwd for vagrant and root
 
 # Install WoD - install scripts managed in backend whatever system we install
-$HOME/wod-backend/scripts/install_system.sh $WODTYPE
+$HOME/wod-backend/install/install-system.sh $WODTYPE

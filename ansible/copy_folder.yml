@@ -150,7 +150,7 @@
       become: yes
       become_user: root
       template:
-        src: "{{ WODBEDIR }}/lab-a511.jupyterlab-workspace.j2"
+        src: "{{ SYSDIR }}/lab-a511.jupyterlab-workspace.j2"
         dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/.jupyter/lab/workspaces/default-37a8.jupyterlab-workspace"
         owner: student{{ STDID }}
         group: student{{ STDID }}
@@ -236,12 +236,12 @@
         group: "{{ WODUSER }}"
         mode: 0751
 
-    - name: Copy the generate-pdf script in the workshop dir
+    - name: Copy the wod-generate-pdf script in the workshop dir
       become: yes
       become_user: root
       copy:
-        src: "{{ SCRIPTDIR }}/generate-pdf.sh"
-        dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/generate-pdf.sh"
+        src: "{{ SYSDIR }}/wod-generate-pdf.sh"
+        dest: "{{ STUDDIR }}/student{{ STDID }}/{{ DIR }}/{{ WORKSHOP }}/wod-generate-pdf.sh"
         owner: student{{ STDID }}
         group: student{{ STDID }}
         mode: 0755

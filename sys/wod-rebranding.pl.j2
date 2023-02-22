@@ -5,7 +5,7 @@ use Data::Dumper;
 use File::Find;
 
 our $maptable;
-eval { require "{{ SCRIPTDIR }}/mapping.cfg.pl"; };
+eval { require "{{ SYSDIR }}/mapping.cfg.pl"; };
 if ($@) {
     print("Config file not found: mapping.cfg.pl\n");
     exit(-1);
@@ -19,7 +19,7 @@ my $dirname = $ARGV[0];
 
 if ((not defined $dirname) || (! -d $dirname )) {
     print("Directory not found: $dirname\n") if (defined $dirname);
-    print("Syntax: rebranding.pl dirname\n");
+    print("Syntax: wod-rebranding.pl dirname\n");
     exit(-1);
 }
 

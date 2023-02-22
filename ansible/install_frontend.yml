@@ -12,7 +12,7 @@
       become: yes
       become_user: root
       package:
-        pkg:
+        name:
         - ansible
         - git
         - rsync
@@ -27,6 +27,7 @@
         - man
         - unzip
         - netcat
+        state: present
         update_cache: yes
 
     - name: Ensure all required DEB packages are installed
@@ -81,13 +82,13 @@
         name: "{{ item }}"
       ignore_errors: yes
       with_items:
-        - kill-processes
+        - wod-kill-processes
 
     - name: Copy WoD service file as ansible template for variable expansion
       become: yes
       become_user: root
       template: src={{ item }} dest=/etc/systemd/system/{{ item | basename | regex_replace('\.j2$') }} mode=0644
-      with_fileglob: [ '{{ WODBEDIR }}//*.service.j2' ]
+      with_fileglob: [ '{{ WODFEDIR }}/sys/*.service.j2' ]
 
     - name: Enable WoD service
       become: yes
@@ -98,7 +99,7 @@
         enabled: yes
         name: "{{ item }}"
       with_items:
-        - kill-processes
+        - wod-kill-processes
 
     - name: Setup ansible configuration
       copy:
@@ -112,7 +113,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ WODFEDIR }}/conf/fail2ban.conf"
+        src: "{{ WODFEDIR }}/sys/fail2ban.conf"
         dest: "/etc/fail2ban/filter.d/jupyterhub.conf"
         owner: root
         group: root
@@ -122,7 +123,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ WODFEDIR }}/conf/fail2ban.jail"
+        src: "{{ WODFEDIR }}/sys/fail2ban.jail"
         dest: "/etc/fail2ban/jail.local"
         owner: root
         group: root
@@ -132,7 +133,7 @@
       become: yes
       become_user: root
       copy:
-        src: "{{ WODFEDIR }}/conf/fail2ban.action"
+        src: "{{ WODFEDIR }}/sys/fail2ban.action"
         dest: "/etc/fail2ban/action.d/jupyterhub.conf"
         owner: root
         group: root

@@ -46,7 +46,7 @@
     become: yes
     become_user: root
     package:
-      pkg:
+      name:
       - docker-client
       - docker-common
       - docker
@@ -90,9 +90,10 @@
     become: yes
     become_user: root
     package:
-      pkg:
+      name:
       - docker-ce
       - docker-compose
+      state: present
 
   - name: Enable Docker service
     become: yes

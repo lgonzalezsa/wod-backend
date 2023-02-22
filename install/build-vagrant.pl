@@ -73,7 +73,7 @@ foreach my $m (@mtypes) {
 		print "Setting up vagrant appliance $h->{$m}\n";
 		my $cmd = "\"./wod-backend/scripts/setup-appliance $wkshp\"";
 		system("vagrant ssh $h->{'backend'} -c \"sudo su - $woduser -c $cmd\"");
-	} elsif ($wodtype =~ /backend/) {
+	} else {
 		system("vagrant ssh $h->{$m} -c \"sudo /vagrant/install.sh -t $m -g production -b $machines{'backend'} -f $machines{'frontend'} -a $machines{'api-db'} -e localhost -u $woduser -s wod\@flossita.org\"");
 	}
 }

@@ -34,18 +34,6 @@
       when:
         - ansible_distribution == "CentOS" or ansible_distribution == "Rocky"
 
-    - name: Install utility scripts
-      become: yes
-      become_user: root
-      template:
-        src: "{{ SCRIPTDIR }}/{{ item }}.j2"
-        dest: /usr/local/bin/{{ item }}
-        owner: root
-        group: root
-        mode: 0755
-      with_items:
-        - fail2ban-IP
-
     - name: Enable WoD services
       become: yes
       become_user: root
