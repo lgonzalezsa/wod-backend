@@ -19,7 +19,14 @@ EOF
 fi
 
 SCRIPT=`realpath $0`
-SCRIPTDIR=`dirname $SCRIPT`
+# This is the installation directory where install scripts are located.
+INSTALLDIR=`dirname $SCRIPT`
+
+# This main dir is computed and is the backend main dir
+export WODBEDIR=`dirname $INSTALLDIR`
+
+# This is where wod.sh will be stored
+SCRIPTDIR="$WODBEDIR/scripts"
 
 if [ $WODTYPE = "backend" ]; then
 	# In case of update remove first old jupyterhub version
@@ -35,8 +42,6 @@ export WODUSER=$WODUSER
 # Name of the wod machine type (backend, api-db, frontend, appliance)
 export WODTYPE=$WODTYPE
 
-# This main dir is computed and is the backend main dir
-export WODBEDIR=`dirname $SCRIPTDIR`
 
 EOF
 cat >> $SCRIPTDIR/wod.sh << 'EOF'
