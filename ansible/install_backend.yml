@@ -339,6 +339,7 @@
         - findspark
         - jwt
         - jinja2-cli
+        - determined
         state: absent
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
@@ -391,6 +392,7 @@
         - findspark
         - jwt
         - jinja2-cli
+        - determined
         state: present
         virtualenv: "{{ JPHUB }}"
         virtualenv_command: "{{ virtualenv_command }}"
